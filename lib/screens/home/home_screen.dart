@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:leafscan_app/theme/app_theme.dart';
+import 'package:leafscan_app/screens/profile/profile_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HomeScreen — main dashboard after login
@@ -44,7 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
+            child: _currentNavIndex == 3
+                ? const ProfileScreen()
+                : SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
