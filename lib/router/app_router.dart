@@ -2,6 +2,9 @@ import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/screens/splash/splash_screen.dart';
 import 'package:leafscan_app/screens/auth/auth_screen.dart';
 import 'package:leafscan_app/screens/home/home_screen.dart';
+import 'package:leafscan_app/screens/scan/scan_screen.dart';
+import 'package:leafscan_app/screens/history/history_screen.dart';
+import 'package:leafscan_app/screens/profile/profile_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AppRouter — GoRouter route definitions
@@ -12,12 +15,12 @@ class AppRouter {
   AppRouter._();
 
   static const String splash = '/';
-  static const String login  = '/login';
-  static const String home   = '/home';
-  // Add more routes here as new screens arrive:
-  // static const String scan    = '/scan';
-  // static const String history = '/history';
-  // static const String profile = '/profile';
+  static const String login = '/login';
+  static const String home = '/home';
+  static const String scan = '/scan';
+
+  static const String profile = '/profile';
+  static const String history = '/history';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -33,6 +36,18 @@ class AppRouter {
       GoRoute(
         path: home,
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: scan,
+        builder: (context, state) => const ScanScreen(),
+      ),
+      GoRoute(
+        path: history,
+        builder: (context, state) => const HistoryScreen(),
+      ),
+      GoRoute(
+        path: profile,
+        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );

@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/theme/app_theme.dart';
 import 'package:leafscan_app/screens/profile/profile_screen.dart';
+import 'package:leafscan_app/router/app_router.dart';
+import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HomeScreen — main dashboard after login
 // Place in: lib/screens/home/home_screen.dart
 // ─────────────────────────────────────────────────────────────────────────────
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int _currentNavIndex = 0;
-
-  // ── Mock data ───────────────────────────────────────────────────────────────
   static const String _userName = 'Sarah Johnson';
 
   static const List<_ScanItem> _recentScans = [
@@ -37,38 +32,29 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   ];
 
-  // ── Build ──────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          Expanded(
-            child: _currentNavIndex == 3
-                ? const ProfileScreen()
-                : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  _buildScanCta(),
-                  const SizedBox(height: 28),
-                  _buildWhySection(),
-                  const SizedBox(height: 28),
-                  _buildRecentScans(),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
-          ),
-          _buildBottomNav(),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            _buildScanCta(context),
+            const SizedBox(height: 28),
+            _buildWhySection(),
+            const SizedBox(height: 28),
+            _buildRecentScans(),
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 0),
     );
   }
 
-  // ── Header (green gradient section) ───────────────────────────────────────
+  // ── Header ─────────────────────────────────────────────────────────────────
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
@@ -89,7 +75,6 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
           child: Column(
             children: [
-              // Top row: avatar + greeting + bell
               Row(
                 children: [
                   Container(
@@ -139,7 +124,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              // Stats card
               _buildStatsCard(),
               const SizedBox(height: 20),
             ],
@@ -211,13 +195,11 @@ class _HomeScreenState extends State<HomeScreen> {
   );
 
   // ── Scan Plant CTA ─────────────────────────────────────────────────────────
-  Widget _buildScanCta() {
+  Widget _buildScanCta(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: GestureDetector(
-        onTap: () {
-          // TODO: navigate to scan screen
-        },
+        onTap: () => context.go(AppRouter.scan),
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -427,7 +409,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Column(
         children: [
-          // Plant thumbnail
           Container(
             width: 72,
             height: 72,
@@ -455,7 +436,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          // Status badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             decoration: BoxDecoration(
@@ -476,61 +456,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  // ── Bottom Navigation ──────────────────────────────────────────────────────
-  Widget _buildBottomNav() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.border, width: 0.5)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _navItem(0, Icons.home_rounded, Icons.home_outlined, 'Home'),
-              _navItem(1, Icons.camera_alt_rounded, Icons.camera_alt_outlined, 'Scan'),
-              _navItem(2, Icons.access_time_rounded, Icons.access_time_outlined, 'History'),
-              _navItem(3, Icons.person_rounded, Icons.person_outlined, 'Profile'),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _navItem(int index, IconData activeIcon, IconData inactiveIcon, String label) {
-    final bool isActive = _currentNavIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _currentNavIndex = index),
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isActive ? activeIcon : inactiveIcon,
-              color: isActive ? AppColors.primary : AppColors.textMuted,
-              size: 24,
-            ),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: isActive ? AppColors.primary : AppColors.textMuted,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

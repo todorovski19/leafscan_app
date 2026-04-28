@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:leafscan_app/theme/app_theme.dart';
 import 'package:leafscan_app/screens/profile/settings_screen.dart';
 import 'package:leafscan_app/screens/profile/edit_profile_screen.dart';
+import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ProfileScreen
@@ -125,6 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 3),
       body: Column(
         children: [
           Expanded(
