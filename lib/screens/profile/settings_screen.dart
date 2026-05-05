@@ -1,416 +1,171 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leafscan_app/providers/theme_provider.dart';
-import 'package:leafscan_app/theme/app_theme.dart';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SettingsScreen — ConsumerStatefulWidget so it can read & write themeProvider
-// Place in: lib/screens/profile/settings_screen.dart
-// ─────────────────────────────────────────────────────────────────────────────
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
-
   @override
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  static const Color _bg          = Color(0xFF161C18);
+  static const Color _cardDark    = Color(0xFF1E2923);
+  static const Color _green       = Color(0xFF5C9E78);
+  static const Color _greenLight  = Color(0xFF7CC49A);
+  static const Color _textPrimary = Color(0xFFF0EDE6);
+  static const Color _textMuted   = Color(0xFF7A9080);
+  static const Color _orange      = Color(0xFFE8924A);
+  static const Color _border      = Color(0xFF243028);
+
   bool _notificationsEnabled = true;
 
   @override
   Widget build(BuildContext context) {
-    // Watch themeProvider — rebuilds when dark/light changes
     final isDark = ref.watch(themeProvider) == ThemeMode.dark;
-
-    final bg       = isDark ? AppColors.darkBackground : AppColors.background;
-    final cardBg   = isDark ? AppColors.darkCardBg     : Colors.white;
-    final textMain = isDark ? AppColors.darkTextDark   : AppColors.textDark;
-    final textSub  = isDark ? AppColors.darkTextMuted  : AppColors.textMuted;
-    final divColor = isDark ? AppColors.darkBorder     : const Color(0xFFEEEEEE);
-    final iconBg   = isDark ? const Color(0xFF2A3D33)  : const Color(0xFFD6EEE2);
-
     return Scaffold(
-      backgroundColor: bg,
-      // ── App Bar ───────────────────────────────────────────────────────────
-      appBar: AppBar(
-        backgroundColor: cardBg,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leadingWidth: 64,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: iconBg,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back_rounded,
-                color: AppColors.primary,
-                size: 20,
-              ),
+      backgroundColor: _bg,
+      body: Column(
+        children: [
+          _buildHeader(context),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+              children: [
+                _sectionLabel('Preferences'),  const SizedBox(height: 10),
+                _card([
+                  _toggleTile(Icons.notifications_outlined, 'Notifications', 'Receive scan updates', _notificationsEnabled, (v) => setState(() => _notificationsEnabled = v)),
+                  _divider(),
+                  _toggleTile(Icons.dark_mode_outlined, 'Dark Mode', 'Switch to dark theme', isDark, (_) => ref.read(themeProvider.notifier).toggle()),
+                  _divider(),
+                  _arrowTile(Icons.language_rounded, 'Language', 'English', () {}),
+                ]),
+                const SizedBox(height: 20),
+                _sectionLabel('Security'), const SizedBox(height: 10),
+                _card([
+                  _arrowTile(Icons.lock_outline_rounded,  'Privacy Settings', 'Manage your data',    () {}),
+                  _divider(),
+                  _arrowTile(Icons.lock_reset_rounded,    'Change Password',  'Update your password', () {}),
+                ]),
+                const SizedBox(height: 20),
+                _sectionLabel('About'), const SizedBox(height: 10),
+                _card([
+                  _arrowTile(Icons.help_outline_rounded,       'Help Center',    'Get support',        () {}),
+                  _divider(),
+                  _arrowTile(Icons.description_outlined,       'Terms & Privacy','Legal information',  () {}),
+                  _divider(),
+                  _plainTile(Icons.insert_drive_file_outlined, 'App Version',    'v1.0.0'),
+                ]),
+                const SizedBox(height: 16),
+                _card([_logOutTile(() {})]),
+                const SizedBox(height: 32),
+                _buildFooter(),
+              ],
             ),
           ),
-        ),
-        title: Text(
-          'Settings',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            color: textMain,
-          ),
-        ),
-        centerTitle: false,
-      ),
-      // ── Body ──────────────────────────────────────────────────────────────
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        children: [
-          // ── Preferences ─────────────────────────────────────────────────
-          _sectionLabel('Preferences', textSub),
-          const SizedBox(height: 10),
-          _card(
-            cardBg: cardBg,
-            children: [
-              _toggleTile(
-                icon: Icons.notifications_outlined,
-                title: 'Notifications',
-                subtitle: 'Receive scan updates',
-                value: _notificationsEnabled,
-                onChanged: (v) => setState(() => _notificationsEnabled = v),
-                textMain: textMain,
-                textSub: textSub,
-                iconBg: iconBg,
-              ),
-              _divider(divColor),
-              // Dark Mode toggle — reads & writes themeProvider
-              _toggleTile(
-                icon: Icons.dark_mode_outlined,
-                title: 'Dark Mode',
-                subtitle: 'Switch to dark theme',
-                value: isDark,
-                onChanged: (_) => ref.read(themeProvider.notifier).toggle(),
-                textMain: textMain,
-                textSub: textSub,
-                iconBg: iconBg,
-              ),
-              _divider(divColor),
-              _arrowTile(
-                icon: Icons.language_rounded,
-                title: 'Language',
-                subtitle: 'English',
-                onTap: () {},
-                textMain: textMain,
-                textSub: textSub,
-                iconBg: iconBg,
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          // ── Security ────────────────────────────────────────────────────
-          _sectionLabel('Security', textSub),
-          const SizedBox(height: 10),
-          _card(
-            cardBg: cardBg,
-            children: [
-              _arrowTile(
-                icon: Icons.lock_outline_rounded,
-                title: 'Privacy Settings',
-                subtitle: 'Manage your data',
-                onTap: () {},
-                textMain: textMain,
-                textSub: textSub,
-                iconBg: iconBg,
-              ),
-              _divider(divColor),
-              _arrowTile(
-                icon: Icons.lock_reset_rounded,
-                title: 'Change Password',
-                subtitle: 'Update your password',
-                onTap: () {},
-                textMain: textMain,
-                textSub: textSub,
-                iconBg: iconBg,
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-
-          // ── About ────────────────────────────────────────────────────────
-          _sectionLabel('About', textSub),
-          const SizedBox(height: 10),
-          _card(
-            cardBg: cardBg,
-            children: [
-              _arrowTile(
-                icon: Icons.help_outline_rounded,
-                title: 'Help Center',
-                subtitle: 'Get support',
-                onTap: () {},
-                textMain: textMain,
-                textSub: textSub,
-                iconBg: iconBg,
-              ),
-              _divider(divColor),
-              _arrowTile(
-                icon: Icons.description_outlined,
-                title: 'Terms & Privacy',
-                subtitle: 'Legal information',
-                onTap: () {},
-                textMain: textMain,
-                textSub: textSub,
-                iconBg: iconBg,
-              ),
-              _divider(divColor),
-              _plainTile(
-                icon: Icons.insert_drive_file_outlined,
-                title: 'App Version',
-                subtitle: 'v1.0.0',
-                textMain: textMain,
-                textSub: textSub,
-                iconBg: iconBg,
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // ── Log Out ──────────────────────────────────────────────────────
-          _card(
-            cardBg: cardBg,
-            children: [_logOutTile(onTap: () {})],
-          ),
-
-          const SizedBox(height: 36),
-
-          // ── Footer ───────────────────────────────────────────────────────
-          _buildFooter(textMain, textSub),
-
-          const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(color: Color(0xFF1A211D), border: Border(bottom: BorderSide(color: Color(0xFF243028), width: 1))),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+          child: Row(children: [
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(width: 38, height: 38, decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(10), border: Border.all(color: _border)),
+                  child: const Icon(Icons.arrow_back_rounded, color: _textMuted, size: 20)),
+            ),
+            const SizedBox(width: 14),
+            const Text('Settings', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: _textPrimary)),
+          ]),
+        ),
+      ),
+    );
+  }
 
-  Widget _sectionLabel(String text, Color color) => Text(
-    text,
-    style: TextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w600,
-      color: color,
+  Widget _sectionLabel(String text) => Text(text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _textMuted, letterSpacing: 0.5));
+
+  Widget _card(List<Widget> children) => Container(
+    decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(16), border: Border.all(color: _border, width: 1)),
+    child: Column(children: children),
+  );
+
+  Widget _divider() => Divider(height: 1, thickness: 0.8, indent: 68, color: _border);
+
+  Widget _iconBubble(IconData icon) => Container(
+    width: 40, height: 40,
+    decoration: BoxDecoration(color: _green.withOpacity(0.13), shape: BoxShape.circle, border: Border.all(color: _green.withOpacity(0.2))),
+    child: Icon(icon, color: _greenLight, size: 19),
+  );
+
+  Widget _toggleTile(IconData icon, String title, String sub, bool value, ValueChanged<bool> onChanged) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    child: Row(children: [
+      _iconBubble(icon), const SizedBox(width: 14),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _textPrimary)),
+        Text(sub,   style: const TextStyle(fontSize: 12, color: _textMuted)),
+      ])),
+      Switch.adaptive(value: value, onChanged: onChanged, activeColor: _green),
+    ]),
+  );
+
+  Widget _arrowTile(IconData icon, String title, String sub, VoidCallback onTap) => InkWell(
+    onTap: onTap, borderRadius: BorderRadius.circular(16),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(children: [
+        _iconBubble(icon), const SizedBox(width: 14),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _textPrimary)),
+          Text(sub,   style: const TextStyle(fontSize: 12, color: _textMuted)),
+        ])),
+        const Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),
+      ]),
     ),
   );
 
-  Widget _card({required Color cardBg, required List<Widget> children}) =>
-      Container(
-        decoration: BoxDecoration(
-          color: cardBg,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 12,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Column(children: children),
-      );
-
-  Widget _divider(Color color) => Divider(
-    height: 1,
-    thickness: 0.8,
-    indent: 70,
-    color: color,
+  Widget _plainTile(IconData icon, String title, String sub) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    child: Row(children: [
+      _iconBubble(icon), const SizedBox(width: 14),
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _textPrimary)),
+        Text(sub,   style: const TextStyle(fontSize: 12, color: _textMuted)),
+      ]),
+    ]),
   );
 
-  Widget _iconBubble(IconData icon, Color bg) => Container(
-    width: 46,
-    height: 46,
-    decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-    child: Icon(icon, color: AppColors.primary, size: 22),
-  );
-
-  Widget _toggleTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-    required Color textMain,
-    required Color textSub,
-    required Color iconBg,
-  }) =>
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          children: [
-            _iconBubble(icon, iconBg),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: textMain)),
-                  const SizedBox(height: 2),
-                  Text(subtitle,
-                      style: TextStyle(fontSize: 13, color: textSub)),
-                ],
-              ),
-            ),
-            Switch.adaptive(
-              value: value,
-              onChanged: onChanged,
-            ),
-          ],
-        ),
-      );
-
-  Widget _arrowTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    required Color textMain,
-    required Color textSub,
-    required Color iconBg,
-  }) =>
-      InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              _iconBubble(icon, iconBg),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: textMain)),
-                    const SizedBox(height: 2),
-                    Text(subtitle,
-                        style: TextStyle(fontSize: 13, color: textSub)),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right_rounded, color: textSub, size: 22),
-            ],
-          ),
-        ),
-      );
-
-  Widget _plainTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color textMain,
-    required Color textSub,
-    required Color iconBg,
-  }) =>
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          children: [
-            _iconBubble(icon, iconBg),
-            const SizedBox(width: 14),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: textMain)),
-                const SizedBox(height: 2),
-                Text(subtitle,
-                    style: TextStyle(fontSize: 13, color: textSub)),
-              ],
-            ),
-          ],
-        ),
-      );
-
-  Widget _logOutTile({required VoidCallback onTap}) => InkWell(
-    onTap: onTap,
-    borderRadius: BorderRadius.circular(20),
+  Widget _logOutTile(VoidCallback onTap) => InkWell(
+    onTap: onTap, borderRadius: BorderRadius.circular(16),
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: const BoxDecoration(
-              color: Color(0xFFFDE8D8),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.logout_rounded,
-                color: Color(0xFFE8924A), size: 22),
-          ),
-          const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text('Log Out',
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFFE8924A))),
-              SizedBox(height: 2),
-              Text('Sign out of your account',
-                  style: TextStyle(
-                      fontSize: 13, color: AppColors.textMuted)),
-            ],
-          ),
-        ],
-      ),
+      child: Row(children: [
+        Container(width: 40, height: 40, decoration: BoxDecoration(color: _orange.withOpacity(0.13), shape: BoxShape.circle, border: Border.all(color: _orange.withOpacity(0.25))),
+            child: const Icon(Icons.logout_rounded, color: _orange, size: 19)),
+        const SizedBox(width: 14),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
+          Text('Log Out',              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _orange)),
+          Text('Sign out of account', style: TextStyle(fontSize: 12, color: _textMuted)),
+        ]),
+      ]),
     ),
   );
 
-  Widget _buildFooter(Color textMain, Color textSub) => Column(
-    children: [
-      Container(
-        width: 80,
-        height: 80,
-        decoration: BoxDecoration(
-          color: const Color(0xFF7CC49A),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: const Icon(Icons.eco_rounded,
-            color: Colors.white, size: 42),
-      ),
-      const SizedBox(height: 12),
-      Text('PlantCare AI',
-          style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              color: textMain)),
-      const SizedBox(height: 4),
-      Text('Your trusted plant health companion',
-          style: TextStyle(fontSize: 13, color: textSub)),
-      const SizedBox(height: 8),
-      Text('© 2026 PlantCare AI. All rights reserved.',
-          style: TextStyle(fontSize: 12, color: textSub)),
-    ],
-  );
+  Widget _buildFooter() => Column(children: [
+    Container(width: 64, height: 64, decoration: BoxDecoration(color: _green.withOpacity(0.15), borderRadius: BorderRadius.circular(18), border: Border.all(color: _green.withOpacity(0.3))),
+        child: const Icon(Icons.eco_rounded, color: _greenLight, size: 32)),
+    const SizedBox(height: 12),
+    const Text('PlantCare AI', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: _textPrimary)),
+    const SizedBox(height: 4),
+    const Text('Your trusted plant health companion', style: TextStyle(fontSize: 12, color: _textMuted)),
+    const SizedBox(height: 6),
+    const Text('© 2026 PlantCare AI. All rights reserved.', style: TextStyle(fontSize: 11, color: _textMuted)),
+  ]);
 }

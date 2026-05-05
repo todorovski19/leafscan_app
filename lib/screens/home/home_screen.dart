@@ -1,52 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leafscan_app/theme/app_theme.dart';
-import 'package:leafscan_app/screens/profile/profile_screen.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
+import 'package:leafscan_app/screens/scans/scans_list_screen.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HomeScreen — main dashboard after login
-// Place in: lib/screens/home/home_screen.dart
-// ─────────────────────────────────────────────────────────────────────────────
-
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
-  static const String _userName = 'Sarah Johnson';
+class _HomeScreenState extends State<HomeScreen> {
+  static const Color _bg          = Color(0xFF161C18);
+  static const Color _cardDark    = Color(0xFF1E2923);
+  static const Color _green       = Color(0xFF5C9E78);
+  static const Color _greenLight  = Color(0xFF7CC49A);
+  static const Color _textPrimary = Color(0xFFF0EDE6);
+  static const Color _textMuted   = Color(0xFF7A9080);
+  static const Color _orange      = Color(0xFFE8924A);
+  static const Color _border      = Color(0xFF243028);
 
   static const List<_ScanItem> _recentScans = [
-    _ScanItem(
-      plantName: 'Tomato Plant',
-      date: 'Mar 20, 2026',
-      status: 'Healthy',
-      isHealthy: true,
-      imageAsset: null,
-    ),
-    _ScanItem(
-      plantName: 'Rose Bush',
-      date: 'Mar 18, 2026',
-      status: 'Early Blight',
-      isHealthy: false,
-      imageAsset: null,
-    ),
+    _ScanItem(plantName: 'Tomato Plant',  date: 'Mar 20, 2026', status: 'Healthy',        isHealthy: true),
+    _ScanItem(plantName: 'Rose Bush',     date: 'Mar 18, 2026', status: 'Early Blight',   isHealthy: false),
+    _ScanItem(plantName: 'Cucumber',      date: 'Mar 15, 2026', status: 'Healthy',        isHealthy: true),
+    _ScanItem(plantName: 'Bell Pepper',   date: 'Mar 12, 2026', status: 'Powdery Mildew', isHealthy: false),
   ];
+
+  final PageController _pageCtrl = PageController(viewportFraction: 0.78);
+  int _currentPage = 0;
+
+  void _goTo(Widget screen) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+  }
+
+  @override
+  void dispose() { _pageCtrl.dispose(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
+      backgroundColor: _bg,
+      body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
-            _buildScanCta(context),
-            const SizedBox(height: 28),
-            _buildWhySection(),
-            const SizedBox(height: 28),
-            _buildRecentScans(),
-            const SizedBox(height: 24),
+            _buildTopBar(context),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 12),
+                    _buildStatsRow(),
+                    const SizedBox(height: 24),
+                    _buildScanButton(context),
+                    const SizedBox(height: 28),
+                    _buildRecentScansHeader(context),
+                    const SizedBox(height: 14),
+                    _buildCarousel(),
+                    const SizedBox(height: 12),
+                    _buildCarouselDots(),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -54,428 +73,218 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // ── Header ─────────────────────────────────────────────────────────────────
-  Widget _buildHeader() {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFA8D5B5), Color(0xFF7CC49A)],
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryDark,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Center(
-                      child: Icon(Icons.eco_rounded, color: Colors.white, size: 24),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Welcome back,',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF2E5C40),
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        Text(
-                          '$_userName 👋',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A3328),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.notifications_outlined, color: Color(0xFF2E5C40), size: 20),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _buildStatsCard(),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatsCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+  // ── Top bar ────────────────────────────────────────────────────────────────
+  Widget _buildTopBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          _statItem('Total Scans', '24', AppColors.textDark),
-          _statDivider(),
-          _statItem('Healthy\nPlants', '18', AppColors.primary),
-          _statDivider(),
-          _statItem('Issues Found', '6', const Color(0xFFE8924A)),
+          GestureDetector(
+            onTap: () => context.go(AppRouter.profile),
+            child: Container(
+              width: 40, height: 40,
+              decoration: BoxDecoration(
+                color: _cardDark,
+                shape: BoxShape.circle,
+                border: Border.all(color: _green.withOpacity(0.4), width: 1.5),
+              ),
+              child: const Icon(Icons.person_rounded, color: _greenLight, size: 22),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _statItem(String label, String value, Color valueColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textMuted,
-            fontWeight: FontWeight.w400,
-            height: 1.3,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w700,
-            color: valueColor,
-            height: 1,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _statDivider() => Container(
-    width: 1,
-    height: 40,
-    color: AppColors.border,
-  );
-
-  // ── Scan Plant CTA ─────────────────────────────────────────────────────────
-  Widget _buildScanCta(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: GestureDetector(
-        onTap: () => context.go(AppRouter.scan),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-          decoration: BoxDecoration(
-            color: const Color(0xFF8EC4A4),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.3),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.camera_alt_outlined, color: Colors.white, size: 24),
-              ),
-              const SizedBox(width: 16),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Scan Plant',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    'Take or upload a photo',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white70,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Why Use PlantCare AI ───────────────────────────────────────────────────
-  Widget _buildWhySection() {
+  // ── Stats row — each card tappable ────────────────────────────────────────
+  Widget _buildStatsRow() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          const Text(
-            'Why Use PlantCare AI?',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _featureCard(
-                  icon: Icons.shield_outlined,
-                  title: 'Early\nDetection',
-                  subtitle: 'Catch diseases before they spread',
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _featureCard(
-                  icon: Icons.trending_up_rounded,
-                  title: 'Track\nProgress',
-                  subtitle: 'Monitor plant health over time',
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _featureCard(
-                  icon: Icons.menu_book_outlined,
-                  title: 'Learn\nMore',
-                  subtitle: 'Access treatment guides',
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _featureCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: AppColors.primaryMint.withOpacity(0.5),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: AppColors.primary, size: 20),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-              height: 1.3,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textMuted,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Recent Scans ───────────────────────────────────────────────────────────
-  Widget _buildRecentScans() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Recent Scans',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  // TODO: navigate to history
-                },
-                child: const Text(
-                  'View All',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          ..._recentScans.map((scan) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: _scanCard(scan),
+          Expanded(child: _statCard(
+            value: '24', label: 'Total Scans', icon: Icons.document_scanner_outlined,
+            valueColor: _textPrimary,
+            onTap: () => _goTo(const ScansListScreen(filter: ScanFilter.all)),
+          )),
+          const SizedBox(width: 10),
+          Expanded(child: _statCard(
+            value: '18', label: 'Healthy', icon: Icons.favorite_rounded,
+            valueColor: _greenLight,
+            onTap: () => _goTo(const ScansListScreen(filter: ScanFilter.healthy)),
+          )),
+          const SizedBox(width: 10),
+          Expanded(child: _statCard(
+            value: '6', label: 'Issues', icon: Icons.warning_amber_rounded,
+            valueColor: _orange,
+            onTap: () => _goTo(const ScansListScreen(filter: ScanFilter.ill)),
           )),
         ],
       ),
     );
   }
 
-  Widget _scanCard(_ScanItem scan) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+  Widget _statCard({required String value, required String label, required IconData icon, required Color valueColor, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        decoration: BoxDecoration(
+          color: _cardDark,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: _border, width: 1),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: valueColor, size: 18),
+            const SizedBox(height: 8),
+            Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: valueColor, height: 1)),
+            const SizedBox(height: 2),
+            Text(label, style: const TextStyle(fontSize: 11, color: _textMuted)),
+          ],
+        ),
       ),
-      child: Column(
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: AppColors.primaryMint.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(Icons.eco, color: AppColors.primary, size: 36),
+    );
+  }
+
+  // ── Scan button ───────────────────────────────────────────────────────────
+  Widget _buildScanButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GestureDetector(
+        onTap: () => context.go(AppRouter.scan),
+        child: Container(
+          width: double.infinity,
+          height: 200,
+          decoration: BoxDecoration(
+            color: _cardDark,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: _green.withOpacity(0.45), width: 1.5),
+            boxShadow: [BoxShadow(color: _green.withOpacity(0.12), blurRadius: 32, spreadRadius: 4)],
           ),
-          const SizedBox(height: 10),
-          Text(
-            scan.plantName,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            scan.date,
-            style: const TextStyle(
-              fontSize: 13,
-              color: AppColors.textMuted,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: scan.isHealthy
-                  ? AppColors.primaryMint.withOpacity(0.4)
-                  : const Color(0xFFF5E0CC),
-              borderRadius: BorderRadius.circular(50),
-            ),
-            child: Text(
-              scan.status,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: scan.isHealthy
-                    ? AppColors.primary
-                    : const Color(0xFFD4722A),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 72, height: 72,
+                decoration: BoxDecoration(
+                  color: _green.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: _greenLight.withOpacity(0.3), width: 1),
+                ),
+                child: const Icon(Icons.camera_alt_rounded, color: _greenLight, size: 34),
               ),
-            ),
+              const SizedBox(height: 18),
+              const Text('Scan Plant', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: _textPrimary)),
+              const SizedBox(height: 5),
+              Text('Take or upload a photo to diagnose', style: TextStyle(fontSize: 13, color: _textMuted)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Recent scans header — View All goes to history ─────────────────────────
+  Widget _buildRecentScansHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Recent Scans', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: _textPrimary)),
+          GestureDetector(
+            onTap: () => context.go(AppRouter.history),
+            child: const Text('View All', style: TextStyle(fontSize: 13, color: _greenLight, fontWeight: FontWeight.w500)),
           ),
         ],
       ),
     );
   }
+
+  // ── Carousel ──────────────────────────────────────────────────────────────
+  Widget _buildCarousel() {
+    return SizedBox(
+      height: 190,
+      child: PageView.builder(
+        controller: _pageCtrl,
+        itemCount: _recentScans.length,
+        onPageChanged: (i) => setState(() => _currentPage = i),
+        itemBuilder: (ctx, i) {
+          final scan = _recentScans[i];
+          final bool isActive = i == _currentPage;
+          final Color accent = scan.isHealthy ? _green : _orange;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOut,
+            margin: EdgeInsets.symmetric(horizontal: 8, vertical: isActive ? 0 : 10),
+            decoration: BoxDecoration(
+              color: _cardDark,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: isActive ? accent.withOpacity(0.45) : _border, width: 1.5),
+              boxShadow: isActive ? [BoxShadow(color: accent.withOpacity(0.1), blurRadius: 16, spreadRadius: 2)] : [],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 52, height: 52,
+                    decoration: BoxDecoration(
+                      color: accent.withOpacity(0.13),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: accent.withOpacity(0.28), width: 1),
+                    ),
+                    child: Icon(Icons.eco_rounded, color: scan.isHealthy ? _greenLight : _orange, size: 24),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(scan.plantName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _textPrimary)),
+                  const SizedBox(height: 2),
+                  Text(scan.date, style: const TextStyle(fontSize: 11, color: _textMuted)),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: accent.withOpacity(0.13),
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(color: accent.withOpacity(0.28), width: 1),
+                    ),
+                    child: Text(scan.status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: scan.isHealthy ? _greenLight : _orange)),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCarouselDots() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(_recentScans.length, (i) {
+        final bool isActive = i == _currentPage;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          width: isActive ? 18 : 5,
+          height: 5,
+          decoration: BoxDecoration(
+            color: isActive ? _greenLight : _border,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        );
+      }),
+    );
+  }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Data model
-// ─────────────────────────────────────────────────────────────────────────────
 class _ScanItem {
-  final String plantName;
-  final String date;
-  final String status;
+  final String plantName, date, status;
   final bool isHealthy;
-  final String? imageAsset;
-
-  const _ScanItem({
-    required this.plantName,
-    required this.date,
-    required this.status,
-    required this.isHealthy,
-    required this.imageAsset,
-  });
+  const _ScanItem({required this.plantName, required this.date, required this.status, required this.isHealthy});
 }

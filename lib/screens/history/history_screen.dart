@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:leafscan_app/theme/app_theme.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// HistoryScreen — scan history with search, filter and monthly chart
-// Place in: lib/screens/history/history_screen.dart
-// ─────────────────────────────────────────────────────────────────────────────
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
-
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  // ── Mock scan data (replace with real backend/provider data) ───────────────
+  static const Color _bg          = Color(0xFF161C18);
+  static const Color _cardDark    = Color(0xFF1E2923);
+  static const Color _green       = Color(0xFF5C9E78);
+  static const Color _greenLight  = Color(0xFF7CC49A);
+  static const Color _textPrimary = Color(0xFFF0EDE6);
+  static const Color _textMuted   = Color(0xFF7A9080);
+  static const Color _orange      = Color(0xFFE8924A);
+  static const Color _border      = Color(0xFF243028);
+
   static const List<_ScanRecord> _allScans = [
     _ScanRecord(plantName: 'Tomato Plant',  date: 'Mar 20, 2026', time: '10:30 AM', status: 'Healthy',        isHealthy: true),
     _ScanRecord(plantName: 'Rose Bush',     date: 'Mar 18, 2026', time: '2:15 PM',  status: 'Early Blight',   isHealthy: false),
@@ -27,51 +28,35 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _ScanRecord(plantName: 'Strawberry',    date: 'Jan 10, 2026', time: '10:00 AM', status: 'Healthy',        isHealthy: true),
   ];
 
-  // Monthly scan counts for chart [Jan, Feb, Mar]
   static const List<_MonthData> _monthlyData = [
     _MonthData(month: 'Jan', count: 2),
     _MonthData(month: 'Feb', count: 3),
     _MonthData(month: 'Mar', count: 5),
   ];
 
-  int _selectedFilter = 0; // 0=All, 1=Healthy, 2=Diseased
+  int _selectedFilter = 0;
   String _searchQuery = '';
   final _searchCtrl = TextEditingController();
 
   @override
-  void dispose() {
-    _searchCtrl.dispose();
-    super.dispose();
-  }
+  void dispose() { _searchCtrl.dispose(); super.dispose(); }
 
   List<_ScanRecord> get _filteredScans {
-    List<_ScanRecord> scans = _allScans;
-
-    // Apply filter tab
-    if (_selectedFilter == 1) {
-      scans = scans.where((s) => s.isHealthy).toList();
-    } else if (_selectedFilter == 2) {
-      scans = scans.where((s) => !s.isHealthy).toList();
-    }
-
-    // Apply search
-    if (_searchQuery.isNotEmpty) {
-      scans = scans
-          .where((s) => s.plantName.toLowerCase().contains(_searchQuery.toLowerCase()))
-          .toList();
-    }
-
+    var scans = _allScans.toList();
+    if (_selectedFilter == 1) scans = scans.where((s) => s.isHealthy).toList();
+    if (_selectedFilter == 2) scans = scans.where((s) => !s.isHealthy).toList();
+    if (_searchQuery.isNotEmpty) scans = scans.where((s) => s.plantName.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
     return scans;
   }
 
-  int get _totalCount   => _allScans.length;
-  int get _healthyCount => _allScans.where((s) => s.isHealthy).length;
+  int get _totalCount    => _allScans.length;
+  int get _healthyCount  => _allScans.where((s) => s.isHealthy).length;
   int get _diseasedCount => _allScans.where((s) => !s.isHealthy).length;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: _bg,
       body: Column(
         children: [
           _buildHeader(),
@@ -87,10 +72,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   const SizedBox(height: 16),
                   ..._filteredScans.isEmpty
                       ? [_buildEmptyState()]
-                      : _filteredScans.map((scan) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _buildScanCard(scan),
-                  )),
+                      : _filteredScans.map((s) => Padding(padding: const EdgeInsets.only(bottom: 12), child: _buildScanCard(s))),
                 ],
               ),
             ),
@@ -101,73 +83,37 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  // ── Header with gradient + search ─────────────────────────────────────────
   Widget _buildHeader() {
     return Container(
-      width: double.infinity,
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFA8D5B5), Color(0xFF7CC49A)],
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
+        color: Color(0xFF1A211D),
+        border: Border(bottom: BorderSide(color: Color(0xFF243028), width: 1)),
       ),
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Scan History',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A3328),
-                ),
-              ),
+              const Text('Scan History', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: _textPrimary)),
               const SizedBox(height: 14),
-              // Search bar
               Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(50),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+                height: 46,
+                decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(50), border: Border.all(color: _border, width: 1)),
                 child: TextField(
                   controller: _searchCtrl,
                   onChanged: (v) => setState(() => _searchQuery = v),
-                  style: const TextStyle(fontSize: 14, color: AppColors.textDark),
+                  style: const TextStyle(fontSize: 14, color: _textPrimary),
                   decoration: InputDecoration(
                     hintText: 'Search plants...',
-                    hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
-                    prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textMuted, size: 20),
+                    hintStyle: const TextStyle(color: _textMuted, fontSize: 14),
+                    prefixIcon: const Icon(Icons.search_rounded, color: _textMuted, size: 20),
                     suffixIcon: _searchQuery.isNotEmpty
-                        ? GestureDetector(
-                      onTap: () {
-                        _searchCtrl.clear();
-                        setState(() => _searchQuery = '');
-                      },
-                      child: const Icon(Icons.close_rounded, color: AppColors.textMuted, size: 18),
-                    )
+                        ? GestureDetector(onTap: () { _searchCtrl.clear(); setState(() => _searchQuery = ''); }, child: const Icon(Icons.close_rounded, color: _textMuted, size: 18))
                         : null,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                    filled: false,
+                    border: InputBorder.none, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 13), filled: false,
                   ),
                 ),
               ),
@@ -178,100 +124,40 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  // ── Monthly bar chart ──────────────────────────────────────────────────────
   Widget _buildMonthlyChart() {
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(20), border: Border.all(color: _border, width: 1)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Monthly Scans',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    '$_totalCount',
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textDark,
-                      height: 1.1,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryMint.withOpacity(0.4),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.trending_up_rounded, color: AppColors.primary, size: 18),
-              ),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('Monthly Scans', style: TextStyle(fontSize: 12, color: _greenLight, fontWeight: FontWeight.w500)),
+                Text('$_totalCount', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700, color: _textPrimary, height: 1.1)),
+              ]),
+              Container(width: 36, height: 36, decoration: BoxDecoration(color: _green.withOpacity(0.15), shape: BoxShape.circle, border: Border.all(color: _green.withOpacity(0.3))),
+                  child: const Icon(Icons.trending_up_rounded, color: _greenLight, size: 18)),
             ],
           ),
           const SizedBox(height: 20),
-          // Bar chart
           SizedBox(
-            height: 100,
+            height: 90,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: _monthlyData.map((data) {
-                final maxCount = _monthlyData
-                    .map((d) => d.count)
-                    .reduce((a, b) => a > b ? a : b);
-                final barHeight = maxCount == 0
-                    ? 0.0
-                    : 70.0 * (data.count / maxCount);
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          height: barHeight,
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryMint.withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          data.month,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
+                final max = _monthlyData.map((d) => d.count).reduce((a, b) => a > b ? a : b);
+                final h = max == 0 ? 0.0 : 65.0 * (data.count / max);
+                return Expanded(child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                    Container(height: h, decoration: BoxDecoration(color: _green.withOpacity(0.5), borderRadius: BorderRadius.circular(8), border: Border.all(color: _greenLight.withOpacity(0.3), width: 1))),
+                    const SizedBox(height: 6),
+                    Text(data.month, style: const TextStyle(fontSize: 12, color: _textMuted)),
+                  ]),
+                ));
               }).toList(),
             ),
           ),
@@ -280,17 +166,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  // ── Filter tabs ────────────────────────────────────────────────────────────
   Widget _buildFilterTabs() {
-    return Row(
-      children: [
-        _filterTab(0, 'All ($_totalCount)'),
-        const SizedBox(width: 10),
-        _filterTab(1, 'Healthy ($_healthyCount)'),
-        const SizedBox(width: 10),
-        _filterTab(2, 'Diseased ($_diseasedCount)'),
-      ],
-    );
+    return Row(children: [
+      _filterTab(0, 'All ($_totalCount)'), const SizedBox(width: 8),
+      _filterTab(1, 'Healthy ($_healthyCount)'), const SizedBox(width: 8),
+      _filterTab(2, 'Diseased ($_diseasedCount)'),
+    ]);
   }
 
   Widget _filterTab(int index, String label) {
@@ -299,172 +180,73 @@ class _HistoryScreenState extends State<HistoryScreen> {
       onTap: () => setState(() => _selectedFilter = index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.primary : Colors.white,
+          color: isActive ? _green.withOpacity(0.2) : _cardDark,
           borderRadius: BorderRadius.circular(50),
-          border: Border.all(
-            color: isActive ? AppColors.primary : AppColors.border,
-            width: 1.2,
-          ),
+          border: Border.all(color: isActive ? _green.withOpacity(0.6) : _border, width: 1),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: isActive ? Colors.white : AppColors.textMuted,
-          ),
-        ),
+        child: Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: isActive ? _greenLight : _textMuted)),
       ),
     );
   }
 
-  // ── Scan card ──────────────────────────────────────────────────────────────
   Widget _buildScanCard(_ScanRecord scan) {
+    final Color accent = scan.isHealthy ? _green : _orange;
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(16), border: Border.all(color: _border, width: 1)),
       child: Row(
         children: [
-          // Plant icon thumbnail
           Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: scan.isHealthy
-                  ? AppColors.primaryMint.withOpacity(0.3)
-                  : const Color(0xFFF5E0CC),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              Icons.eco_rounded,
-              color: scan.isHealthy ? AppColors.primary : const Color(0xFFD4722A),
-              size: 32,
-            ),
+            width: 56, height: 56,
+            decoration: BoxDecoration(color: accent.withOpacity(0.13), borderRadius: BorderRadius.circular(14), border: Border.all(color: accent.withOpacity(0.25), width: 1)),
+            child: Icon(Icons.eco_rounded, color: scan.isHealthy ? _greenLight : _orange, size: 26),
           ),
           const SizedBox(width: 14),
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  scan.plantName,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: scan.isHealthy ? AppColors.primary : const Color(0xFFD4722A),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textMuted),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${scan.date} • ${scan.time}',
-                      style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                // Status badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: scan.isHealthy
-                        ? AppColors.primaryMint.withOpacity(0.3)
-                        : const Color(0xFFF5E0CC),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Text(
-                    scan.status,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: scan.isHealthy ? AppColors.primary : const Color(0xFFD4722A),
-                    ),
-                  ),
-                ),
-              ],
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(scan.plantName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: scan.isHealthy ? _greenLight : _orange)),
+            const SizedBox(height: 4),
+            Row(children: [
+              const Icon(Icons.calendar_today_outlined, size: 11, color: _textMuted), const SizedBox(width: 4),
+              Text('${scan.date} · ${scan.time}', style: const TextStyle(fontSize: 11, color: _textMuted)),
+            ]),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(color: accent.withOpacity(0.13), borderRadius: BorderRadius.circular(50), border: Border.all(color: accent.withOpacity(0.25), width: 1)),
+              child: Text(scan.status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: scan.isHealthy ? _greenLight : _orange)),
             ),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted, size: 20),
+          ])),
+          const Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),
         ],
       ),
     );
   }
 
-  // ── Empty state ────────────────────────────────────────────────────────────
   Widget _buildEmptyState() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 48),
-      child: Center(
-        child: Column(
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: AppColors.primaryMint.withOpacity(0.3),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.search_off_rounded, color: AppColors.primary, size: 36),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'No plants found',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textDark),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Try a different search or filter',
-              style: TextStyle(fontSize: 13, color: AppColors.textMuted),
-            ),
-          ],
-        ),
-      ),
+      child: Center(child: Column(children: [
+        Container(width: 64, height: 64, decoration: BoxDecoration(color: _green.withOpacity(0.1), shape: BoxShape.circle, border: Border.all(color: _green.withOpacity(0.2))),
+            child: const Icon(Icons.search_off_rounded, color: _greenLight, size: 30)),
+        const SizedBox(height: 16),
+        const Text('No plants found', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: _textPrimary)),
+        const SizedBox(height: 6),
+        const Text('Try a different search or filter', style: TextStyle(fontSize: 13, color: _textMuted)),
+      ])),
     );
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Data models
-// ─────────────────────────────────────────────────────────────────────────────
 class _ScanRecord {
-  final String plantName;
-  final String date;
-  final String time;
-  final String status;
+  final String plantName, date, time, status;
   final bool isHealthy;
-
-  const _ScanRecord({
-    required this.plantName,
-    required this.date,
-    required this.time,
-    required this.status,
-    required this.isHealthy,
-  });
+  const _ScanRecord({required this.plantName, required this.date, required this.time, required this.status, required this.isHealthy});
 }
 
 class _MonthData {
   final String month;
   final int count;
-
-  const _MonthData({
-    required this.month,
-    required this.count,
-  });
+  const _MonthData({required this.month, required this.count});
 }
