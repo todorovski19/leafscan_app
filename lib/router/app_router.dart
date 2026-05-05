@@ -6,6 +6,7 @@ import 'package:leafscan_app/screens/scan/scan_screen.dart';
 import 'package:leafscan_app/screens/history/history_screen.dart';
 import 'package:leafscan_app/screens/profile/profile_screen.dart';
 import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
+import 'package:leafscan_app/screens/plant/plant_detail_screen.dart';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -24,6 +25,7 @@ class AppRouter {
   static const String profile = '/profile';
   static const String history = '/history';
   static const String diseaseDetail = '/disease/:id';
+  static const String plantDetail   = '/plant/:id';
 
 
   static final router = GoRouter(
@@ -56,9 +58,15 @@ class AppRouter {
       GoRoute(
         path: '/disease/:id',
         builder: (context, state) {
-          // Го земаме id-то од URL-от и го претвораме во int
           final id = int.parse(state.pathParameters['id']!);
           return DiseaseDetailScreen(diseaseId: id);
+        },
+      ),
+      GoRoute(
+        path: '/plant/:id',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return PlantDetailScreen(plantId: id);
         },
       ),
     ],

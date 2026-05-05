@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
-import 'package:leafscan_app/screens/scans/scans_list_screen.dart';ГИ
+import 'package:leafscan_app/screens/scans/scans_list_screen.dart';
 import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
 import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
 
