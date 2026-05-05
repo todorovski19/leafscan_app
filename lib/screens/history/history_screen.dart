@@ -1,4 +1,7 @@
+
+
 import 'package:flutter/material.dart';
+import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
 import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
 
@@ -54,6 +57,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
   int get _healthyCount  => _allScans.where((s) => s.isHealthy).length;
   int get _diseasedCount => _allScans.where((s) => !s.isHealthy).length;
 
+  // ── Navigation to detail ──────────────────────────────────────────────────
+  void _openDetail(_ScanRecord scan) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ScanDetailScreen(
+          data: sampleDetailFromRecord(
+            plantName: scan.plantName,
+            date: scan.date,
+            time: scan.time,
+            isHealthy: scan.isHealthy,
+            status: scan.status,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,7 +93,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   const SizedBox(height: 16),
                   ..._filteredScans.isEmpty
                       ? [_buildEmptyState()]
-                      : _filteredScans.map((s) => Padding(padding: const EdgeInsets.only(bottom: 12), child: _buildScanCard(s))),
+                      : _filteredScans.map((s) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: GestureDetector(
+                      onTap: () => _openDetail(s),
+                      child: _buildScanCard(s),
+                    ),
+                  )),
                 ],
               ),
             ),

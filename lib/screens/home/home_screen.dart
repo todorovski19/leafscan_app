@@ -3,7 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
 import 'package:leafscan_app/screens/scans/scans_list_screen.dart';
+<<<<<<< HEAD
 import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
+=======
+import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
+>>>>>>> origin/main
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -98,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Stats row — each card tappable ────────────────────────────────────────
+  // ── Stats row ─────────────────────────────────────────────────────────────
   Widget _buildStatsRow() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -126,7 +130,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _statCard({required String value, required String label, required IconData icon, required Color valueColor, required VoidCallback onTap}) {
+  Widget _statCard({
+    required String value,
+    required String label,
+    required IconData icon,
+    required Color valueColor,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -180,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 18),
               const Text('Scan Plant', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: _textPrimary)),
               const SizedBox(height: 5),
-              Text('Take or upload a photo to diagnose', style: TextStyle(fontSize: 13, color: _textMuted)),
+              const Text('Take or upload a photo to diagnose', style: TextStyle(fontSize: 13, color: _textMuted)),
             ],
           ),
         ),
@@ -188,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Recent scans header — View All goes to history ─────────────────────────
+  // ── Recent scans header ───────────────────────────────────────────────────
   Widget _buildRecentScansHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -218,17 +228,32 @@ class _HomeScreenState extends State<HomeScreen> {
           final bool isActive = i == _currentPage;
           final Color accent = scan.isHealthy ? _green : _orange;
           return GestureDetector(
-            // ── ДОДАДЕНО: onTap за навигација до Disease Detail ─────────────
-            onTap: !scan.isHealthy && scan.diseaseId != null
-                ? () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    DiseaseDetailScreen(diseaseId: scan.diseaseId!),
-              ),
-            )
-                : null,
-            // ────────────────────────────────────────────────────────────────
+            onTap: () {
+              if (!scan.isHealthy && scan.diseaseId != null) {
+                // Болесни → Disease Detail
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DiseaseDetailScreen(diseaseId: scan.diseaseId!),
+                  ),
+                );
+              } else {
+                // Здрави → Scan Detail
+                Navigator.of(ctx).push(
+                  MaterialPageRoute(
+                    builder: (_) => ScanDetailScreen(
+                      data: sampleDetailFromRecord(
+                        plantName: scan.plantName,
+                        date: scan.date,
+                        time: '—',
+                        isHealthy: scan.isHealthy,
+                        status: scan.status,
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 280),
               curve: Curves.easeOut,
@@ -277,6 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // ── Carousel dots ─────────────────────────────────────────────────────────
   Widget _buildCarouselDots() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
