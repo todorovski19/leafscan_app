@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ScansListScreen — reusable screen for All / Healthy / Ill scans
-// lib/screens/scans/scans_list_screen.dart
-// ─────────────────────────────────────────────────────────────────────────────
+import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
 
 enum ScanFilter { all, healthy, ill }
 
@@ -26,20 +22,20 @@ class _ScansListScreenState extends State<ScansListScreen> {
   static const Color _border      = Color(0xFF243028);
 
   static const List<_ScanRecord> _allScans = [
-    _ScanRecord(plantName: 'Tomato Plant',  date: 'Mar 20, 2026', time: '10:30 AM', status: 'Healthy',        isHealthy: true),
-    _ScanRecord(plantName: 'Rose Bush',     date: 'Mar 18, 2026', time: '2:15 PM',  status: 'Early Blight',   isHealthy: false),
-    _ScanRecord(plantName: 'Cucumber',      date: 'Mar 15, 2026', time: '9:45 AM',  status: 'Healthy',        isHealthy: true),
-    _ScanRecord(plantName: 'Bell Pepper',   date: 'Mar 12, 2026', time: '11:20 AM', status: 'Powdery Mildew', isHealthy: false),
-    _ScanRecord(plantName: 'Basil',         date: 'Feb 28, 2026', time: '3:00 PM',  status: 'Healthy',        isHealthy: true),
-    _ScanRecord(plantName: 'Sunflower',     date: 'Feb 14, 2026', time: '8:10 AM',  status: 'Healthy',        isHealthy: true),
-    _ScanRecord(plantName: 'Mint',          date: 'Jan 30, 2026', time: '1:45 PM',  status: 'Rust Disease',   isHealthy: false),
-    _ScanRecord(plantName: 'Strawberry',    date: 'Jan 10, 2026', time: '10:00 AM', status: 'Healthy',        isHealthy: true),
-    _ScanRecord(plantName: 'Lavender',      date: 'Jan 5, 2026',  time: '4:00 PM',  status: 'Healthy',        isHealthy: true),
-    _ScanRecord(plantName: 'Fern',          date: 'Dec 28, 2025', time: '11:00 AM', status: 'Root Rot',       isHealthy: false),
-    _ScanRecord(plantName: 'Orchid',        date: 'Dec 15, 2025', time: '2:30 PM',  status: 'Healthy',        isHealthy: true),
-    _ScanRecord(plantName: 'Cactus',        date: 'Dec 10, 2025', time: '9:00 AM',  status: 'Healthy',        isHealthy: true),
-    _ScanRecord(plantName: 'Aloe Vera',     date: 'Dec 3, 2025',  time: '3:45 PM',  status: 'Leaf Spot',      isHealthy: false),
-    _ScanRecord(plantName: 'Peace Lily',    date: 'Nov 22, 2025', time: '10:15 AM', status: 'Healthy',        isHealthy: true),
+    _ScanRecord(plantName: 'Tomato Plant',  date: 'Mar 20, 2026', time: '10:30 AM', status: 'Healthy',        isHealthy: true,  diseaseId: null),
+    _ScanRecord(plantName: 'Rose Bush',     date: 'Mar 18, 2026', time: '2:15 PM',  status: 'Early Blight',   isHealthy: false, diseaseId: 999),
+    _ScanRecord(plantName: 'Cucumber',      date: 'Mar 15, 2026', time: '9:45 AM',  status: 'Healthy',        isHealthy: true,  diseaseId: null),
+    _ScanRecord(plantName: 'Bell Pepper',   date: 'Mar 12, 2026', time: '11:20 AM', status: 'Powdery Mildew', isHealthy: false, diseaseId: 999),
+    _ScanRecord(plantName: 'Basil',         date: 'Feb 28, 2026', time: '3:00 PM',  status: 'Healthy',        isHealthy: true,  diseaseId: null),
+    _ScanRecord(plantName: 'Sunflower',     date: 'Feb 14, 2026', time: '8:10 AM',  status: 'Healthy',        isHealthy: true,  diseaseId: null),
+    _ScanRecord(plantName: 'Mint',          date: 'Jan 30, 2026', time: '1:45 PM',  status: 'Rust Disease',   isHealthy: false, diseaseId: 999),
+    _ScanRecord(plantName: 'Strawberry',    date: 'Jan 10, 2026', time: '10:00 AM', status: 'Healthy',        isHealthy: true,  diseaseId: null),
+    _ScanRecord(plantName: 'Lavender',      date: 'Jan 5, 2026',  time: '4:00 PM',  status: 'Healthy',        isHealthy: true,  diseaseId: null),
+    _ScanRecord(plantName: 'Fern',          date: 'Dec 28, 2025', time: '11:00 AM', status: 'Root Rot',       isHealthy: false, diseaseId: 999),
+    _ScanRecord(plantName: 'Orchid',        date: 'Dec 15, 2025', time: '2:30 PM',  status: 'Healthy',        isHealthy: true,  diseaseId: null),
+    _ScanRecord(plantName: 'Cactus',        date: 'Dec 10, 2025', time: '9:00 AM',  status: 'Healthy',        isHealthy: true,  diseaseId: null),
+    _ScanRecord(plantName: 'Aloe Vera',     date: 'Dec 3, 2025',  time: '3:45 PM',  status: 'Leaf Spot',      isHealthy: false, diseaseId: 999),
+    _ScanRecord(plantName: 'Peace Lily',    date: 'Nov 22, 2025', time: '10:15 AM', status: 'Healthy',        isHealthy: true,  diseaseId: null),
   ];
 
   String _searchQuery = '';
@@ -105,7 +101,6 @@ class _ScansListScreenState extends State<ScansListScreen> {
     );
   }
 
-  // ── Header ─────────────────────────────────────────────────────────────────
   Widget _buildHeader(BuildContext context, int count) {
     return Container(
       decoration: const BoxDecoration(
@@ -136,7 +131,6 @@ class _ScansListScreenState extends State<ScansListScreen> {
                   const SizedBox(width: 14),
                   Text(_title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: _textPrimary)),
                   const Spacer(),
-                  // Count badge
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
@@ -155,7 +149,6 @@ class _ScansListScreenState extends State<ScansListScreen> {
                 ],
               ),
               const SizedBox(height: 14),
-              // Search
               Container(
                 height: 44,
                 decoration: BoxDecoration(
@@ -192,59 +185,67 @@ class _ScansListScreenState extends State<ScansListScreen> {
     );
   }
 
-  // ── Scan card ──────────────────────────────────────────────────────────────
   Widget _buildScanCard(_ScanRecord scan) {
     final Color accent = scan.isHealthy ? _green : _orange;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: _cardDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _border, width: 1),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 56, height: 56,
-            decoration: BoxDecoration(
-              color: accent.withOpacity(0.13),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: accent.withOpacity(0.25), width: 1),
+    return GestureDetector(
+      onTap: !scan.isHealthy && scan.diseaseId != null
+          ? () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DiseaseDetailScreen(diseaseId: scan.diseaseId!),
+        ),
+      )
+          : null,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: _cardDark,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: _border, width: 1),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 56, height: 56,
+              decoration: BoxDecoration(
+                color: accent.withOpacity(0.13),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: accent.withOpacity(0.25), width: 1),
+              ),
+              child: Icon(Icons.eco_rounded, color: scan.isHealthy ? _greenLight : _orange, size: 26),
             ),
-            child: Icon(Icons.eco_rounded, color: scan.isHealthy ? _greenLight : _orange, size: 26),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(scan.plantName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: scan.isHealthy ? _greenLight : _orange)),
-                const SizedBox(height: 4),
-                Row(children: [
-                  const Icon(Icons.calendar_today_outlined, size: 11, color: _textMuted),
-                  const SizedBox(width: 4),
-                  Text('${scan.date} · ${scan.time}', style: const TextStyle(fontSize: 11, color: _textMuted)),
-                ]),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: accent.withOpacity(0.13),
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border.all(color: accent.withOpacity(0.25), width: 1),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(scan.plantName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: scan.isHealthy ? _greenLight : _orange)),
+                  const SizedBox(height: 4),
+                  Row(children: [
+                    const Icon(Icons.calendar_today_outlined, size: 11, color: _textMuted),
+                    const SizedBox(width: 4),
+                    Text('${scan.date} · ${scan.time}', style: const TextStyle(fontSize: 11, color: _textMuted)),
+                  ]),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: accent.withOpacity(0.13),
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(color: accent.withOpacity(0.25), width: 1),
+                    ),
+                    child: Text(scan.status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: scan.isHealthy ? _greenLight : _orange)),
                   ),
-                  child: Text(scan.status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: scan.isHealthy ? _greenLight : _orange)),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),
-        ],
+            const Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),
+          ],
+        ),
       ),
     );
   }
 
-  // ── Empty state ────────────────────────────────────────────────────────────
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -272,5 +273,14 @@ class _ScansListScreenState extends State<ScansListScreen> {
 class _ScanRecord {
   final String plantName, date, time, status;
   final bool isHealthy;
-  const _ScanRecord({required this.plantName, required this.date, required this.time, required this.status, required this.isHealthy});
+  final int? diseaseId;
+
+  const _ScanRecord({
+    required this.plantName,
+    required this.date,
+    required this.time,
+    required this.status,
+    required this.isHealthy,
+    required this.diseaseId,
+  });
 }
