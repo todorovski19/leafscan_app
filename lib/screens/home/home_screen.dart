@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
 import 'package:leafscan_app/screens/scans/scans_list_screen.dart';
+import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -97,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Stats row — each card tappable ────────────────────────────────────────
+  // ── Stats row ─────────────────────────────────────────────────────────────
   Widget _buildStatsRow() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -125,7 +126,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _statCard({required String value, required String label, required IconData icon, required Color valueColor, required VoidCallback onTap}) {
+  Widget _statCard({
+    required String value,
+    required String label,
+    required IconData icon,
+    required Color valueColor,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -179,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 18),
               const Text('Scan Plant', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: _textPrimary)),
               const SizedBox(height: 5),
-              Text('Take or upload a photo to diagnose', style: TextStyle(fontSize: 13, color: _textMuted)),
+              const Text('Take or upload a photo to diagnose', style: TextStyle(fontSize: 13, color: _textMuted)),
             ],
           ),
         ),
@@ -187,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Recent scans header — View All goes to history ─────────────────────────
+  // ── Recent scans header ───────────────────────────────────────────────────
   Widget _buildRecentScansHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -216,45 +223,60 @@ class _HomeScreenState extends State<HomeScreen> {
           final scan = _recentScans[i];
           final bool isActive = i == _currentPage;
           final Color accent = scan.isHealthy ? _green : _orange;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 280),
-            curve: Curves.easeOut,
-            margin: EdgeInsets.symmetric(horizontal: 8, vertical: isActive ? 0 : 10),
-            decoration: BoxDecoration(
-              color: _cardDark,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: isActive ? accent.withOpacity(0.45) : _border, width: 1.5),
-              boxShadow: isActive ? [BoxShadow(color: accent.withOpacity(0.1), blurRadius: 16, spreadRadius: 2)] : [],
+          return GestureDetector(
+            onTap: () => Navigator.of(ctx).push(
+              MaterialPageRoute(
+                builder: (_) => ScanDetailScreen(
+                  data: sampleDetailFromRecord(
+                    plantName: scan.plantName,
+                    date: scan.date,
+                    time: '—',
+                    isHealthy: scan.isHealthy,
+                    status: scan.status,
+                  ),
+                ),
+              ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 52, height: 52,
-                    decoration: BoxDecoration(
-                      color: accent.withOpacity(0.13),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: accent.withOpacity(0.28), width: 1),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 280),
+              curve: Curves.easeOut,
+              margin: EdgeInsets.symmetric(horizontal: 8, vertical: isActive ? 0 : 10),
+              decoration: BoxDecoration(
+                color: _cardDark,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: isActive ? accent.withOpacity(0.45) : _border, width: 1.5),
+                boxShadow: isActive ? [BoxShadow(color: accent.withOpacity(0.1), blurRadius: 16, spreadRadius: 2)] : [],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 52, height: 52,
+                      decoration: BoxDecoration(
+                        color: accent.withOpacity(0.13),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: accent.withOpacity(0.28), width: 1),
+                      ),
+                      child: Icon(Icons.eco_rounded, color: scan.isHealthy ? _greenLight : _orange, size: 24),
                     ),
-                    child: Icon(Icons.eco_rounded, color: scan.isHealthy ? _greenLight : _orange, size: 24),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(scan.plantName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _textPrimary)),
-                  const SizedBox(height: 2),
-                  Text(scan.date, style: const TextStyle(fontSize: 11, color: _textMuted)),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: accent.withOpacity(0.13),
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(color: accent.withOpacity(0.28), width: 1),
+                    const SizedBox(height: 10),
+                    Text(scan.plantName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _textPrimary)),
+                    const SizedBox(height: 2),
+                    Text(scan.date, style: const TextStyle(fontSize: 11, color: _textMuted)),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: accent.withOpacity(0.13),
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(color: accent.withOpacity(0.28), width: 1),
+                      ),
+                      child: Text(scan.status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: scan.isHealthy ? _greenLight : _orange)),
                     ),
-                    child: Text(scan.status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: scan.isHealthy ? _greenLight : _orange)),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
@@ -263,6 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // ── Carousel dots ─────────────────────────────────────────────────────────
   Widget _buildCarouselDots() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
