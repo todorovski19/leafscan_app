@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
-import 'package:leafscan_app/screens/scans/scans_list_screen.dart';ГИ
-import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
-import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
+import 'package:leafscan_app/screens/scans/scans_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,10 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
   static const Color _border      = Color(0xFF243028);
 
   static const List<_ScanItem> _recentScans = [
-    _ScanItem(plantName: 'Tomato Plant',  date: 'Mar 20, 2026', status: 'Healthy',        isHealthy: true,  diseaseId: null),
-    _ScanItem(plantName: 'Rose Bush',     date: 'Mar 18, 2026', status: 'Early Blight',   isHealthy: false, diseaseId: 999),
-    _ScanItem(plantName: 'Cucumber',      date: 'Mar 15, 2026', status: 'Healthy',        isHealthy: true,  diseaseId: null),
-    _ScanItem(plantName: 'Bell Pepper',   date: 'Mar 12, 2026', status: 'Powdery Mildew', isHealthy: false, diseaseId: 999),
+    _ScanItem(plantName: 'Tomato Plant',  date: 'Mar 20, 2026', status: 'Healthy',        isHealthy: true),
+    _ScanItem(plantName: 'Rose Bush',     date: 'Mar 18, 2026', status: 'Early Blight',   isHealthy: false),
+    _ScanItem(plantName: 'Cucumber',      date: 'Mar 15, 2026', status: 'Healthy',        isHealthy: true),
+    _ScanItem(plantName: 'Bell Pepper',   date: 'Mar 12, 2026', status: 'Powdery Mildew', isHealthy: false),
   ];
 
   final PageController _pageCtrl = PageController(viewportFraction: 0.78);
@@ -83,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           GestureDetector(
-            onTap: () => context.push(AppRouter.profile),
+            onTap: () => context.go(AppRouter.profile),
             child: Container(
               width: 40, height: 40,
               decoration: BoxDecoration(
@@ -99,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Stats row ─────────────────────────────────────────────────────────────
+  // ── Stats row — each card tappable ────────────────────────────────────────
   Widget _buildStatsRow() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -127,13 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _statCard({
-    required String value,
-    required String label,
-    required IconData icon,
-    required Color valueColor,
-    required VoidCallback onTap,
-  }) {
+  Widget _statCard({required String value, required String label, required IconData icon, required Color valueColor, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -187,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 18),
               const Text('Scan Plant', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: _textPrimary)),
               const SizedBox(height: 5),
-              const Text('Take or upload a photo to diagnose', style: TextStyle(fontSize: 13, color: _textMuted)),
+              Text('Take or upload a photo to diagnose', style: TextStyle(fontSize: 13, color: _textMuted)),
             ],
           ),
         ),
@@ -195,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Recent scans header ───────────────────────────────────────────────────
+  // ── Recent scans header — View All goes to history ─────────────────────────
   Widget _buildRecentScansHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -215,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // ── Carousel ──────────────────────────────────────────────────────────────
   Widget _buildCarousel() {
     return SizedBox(
-      height: 210,
+      height: 190,
       child: PageView.builder(
         controller: _pageCtrl,
         itemCount: _recentScans.length,
@@ -224,73 +216,45 @@ class _HomeScreenState extends State<HomeScreen> {
           final scan = _recentScans[i];
           final bool isActive = i == _currentPage;
           final Color accent = scan.isHealthy ? _green : _orange;
-          return GestureDetector(
-            onTap: () {
-              if (!scan.isHealthy && scan.diseaseId != null) {
-                // Болесни → Disease Detail
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => DiseaseDetailScreen(diseaseId: scan.diseaseId!),
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOut,
+            margin: EdgeInsets.symmetric(horizontal: 8, vertical: isActive ? 0 : 10),
+            decoration: BoxDecoration(
+              color: _cardDark,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: isActive ? accent.withOpacity(0.45) : _border, width: 1.5),
+              boxShadow: isActive ? [BoxShadow(color: accent.withOpacity(0.1), blurRadius: 16, spreadRadius: 2)] : [],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 52, height: 52,
+                    decoration: BoxDecoration(
+                      color: accent.withOpacity(0.13),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: accent.withOpacity(0.28), width: 1),
+                    ),
+                    child: Icon(Icons.eco_rounded, color: scan.isHealthy ? _greenLight : _orange, size: 24),
                   ),
-                );
-              } else {
-                // Здрави → Scan Detail
-                Navigator.of(ctx).push(
-                  MaterialPageRoute(
-                    builder: (_) => ScanDetailScreen(
-                      data: sampleDetailFromRecord(
-                        plantName: scan.plantName,
-                        date: scan.date,
-                        time: '—',
-                        isHealthy: scan.isHealthy,
-                        status: scan.status,
-                      ),
+                  const SizedBox(height: 10),
+                  Text(scan.plantName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _textPrimary)),
+                  const SizedBox(height: 2),
+                  Text(scan.date, style: const TextStyle(fontSize: 11, color: _textMuted)),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: accent.withOpacity(0.13),
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(color: accent.withOpacity(0.28), width: 1),
                     ),
+                    child: Text(scan.status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: scan.isHealthy ? _greenLight : _orange)),
                   ),
-                );
-              }
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 280),
-              curve: Curves.easeOut,
-              margin: EdgeInsets.symmetric(horizontal: 8, vertical: isActive ? 0 : 10),
-              decoration: BoxDecoration(
-                color: _cardDark,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: isActive ? accent.withOpacity(0.45) : _border, width: 1.5),
-                boxShadow: isActive ? [BoxShadow(color: accent.withOpacity(0.1), blurRadius: 16, spreadRadius: 2)] : [],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 52, height: 52,
-                      decoration: BoxDecoration(
-                        color: accent.withOpacity(0.13),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: accent.withOpacity(0.28), width: 1),
-                      ),
-                      child: Icon(Icons.eco_rounded, color: scan.isHealthy ? _greenLight : _orange, size: 24),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(scan.plantName, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _textPrimary)),
-                    const SizedBox(height: 2),
-                    Text(scan.date, style: const TextStyle(fontSize: 11, color: _textMuted)),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: accent.withOpacity(0.13),
-                        borderRadius: BorderRadius.circular(50),
-                        border: Border.all(color: accent.withOpacity(0.28), width: 1),
-                      ),
-                      child: Text(scan.status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: scan.isHealthy ? _greenLight : _orange)),
-                    ),
-                  ],
-                ),
+                ],
               ),
             ),
           );
@@ -299,7 +263,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Carousel dots ─────────────────────────────────────────────────────────
   Widget _buildCarouselDots() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -323,6 +286,5 @@ class _HomeScreenState extends State<HomeScreen> {
 class _ScanItem {
   final String plantName, date, status;
   final bool isHealthy;
-  final int? diseaseId;
-  const _ScanItem({required this.plantName, required this.date, required this.status, required this.isHealthy, required this.diseaseId,});
+  const _ScanItem({required this.plantName, required this.date, required this.status, required this.isHealthy});
 }
