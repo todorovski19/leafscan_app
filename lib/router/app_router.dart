@@ -6,7 +6,10 @@ import 'package:leafscan_app/screens/scan/scan_screen.dart';
 import 'package:leafscan_app/screens/history/history_screen.dart';
 import 'package:leafscan_app/screens/profile/profile_screen.dart';
 import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
-
+import 'package:leafscan_app/screens/plant/plant_detail_screen.dart';
+import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
+import 'package:leafscan_app/screens/scans/upload_screen.dart';
+import 'package:leafscan_app/screens/scans/analyzing_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AppRouter — GoRouter route definitions
@@ -20,11 +23,13 @@ class AppRouter {
   static const String login = '/login';
   static const String home = '/home';
   static const String scan = '/scan';
-
+  static const String result    = '/result';
   static const String profile = '/profile';
   static const String history = '/history';
   static const String diseaseDetail = '/disease/:id';
-
+  static const String plantDetail   = '/plant/:id';
+  static const String upload = '/upload';
+  static const String analyzing = '/analyzing';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -56,9 +61,36 @@ class AppRouter {
       GoRoute(
         path: '/disease/:id',
         builder: (context, state) {
-          // Го земаме id-то од URL-от и го претвораме во int
           final id = int.parse(state.pathParameters['id']!);
           return DiseaseDetailScreen(diseaseId: id);
+        },
+      ),
+      GoRoute(
+        path: '/plant/:id',
+        builder: (context, state) {
+          final id = int.parse(state.pathParameters['id']!);
+          return PlantDetailScreen(plantId: id);
+        },
+      ),
+      GoRoute(
+        path: result,
+        builder: (context, state) {
+          final data = state.extra as ScanDetailData;
+          return ScanDetailScreen(data: data);
+        },
+      ),
+      GoRoute(
+        path: upload,
+        builder: (context, state) {
+          final imagePath = state.extra as String;
+          return UploadScreen(imagePath: imagePath);
+        },
+      ),
+      GoRoute(
+        path: analyzing,
+        builder: (context, state) {
+          final imagePath = state.extra as String;
+          return AnalyzingScreen(imagePath: imagePath);
         },
       ),
     ],
