@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
 import 'package:leafscan_app/screens/plant/plant_detail_screen.dart';
 
@@ -68,6 +70,7 @@ class ScanDetailScreen extends StatelessWidget {
               errorBuilder: (_, __, ___) => _buildImagePlaceholder())
               : _buildImagePlaceholder(),
         ),
+        // Gradient overlay
         Positioned(
           bottom: 0, left: 0, right: 0,
           child: Container(
@@ -81,24 +84,45 @@ class ScanDetailScreen extends StatelessWidget {
             ),
           ),
         ),
+        // ── Back button — pill style ──────────────────────────────────────
         Positioned(
           top: 0, left: 0, right: 0,
           child: SafeArea(
             bottom: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
-                child: Container(
-                  width: 38, height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.45),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.white.withOpacity(0.15)),
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => context.go(AppRouter.home),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 9),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.55),
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(
+                            color: Colors.white.withOpacity(0.15), width: 1),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white, size: 14),
+                          SizedBox(width: 6),
+                          Text(
+                            'Home',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: const Icon(Icons.arrow_back_rounded,
-                      color: Colors.white, size: 20),
-                ),
+                ],
               ),
             ),
           ),
@@ -116,7 +140,7 @@ class ScanDetailScreen extends StatelessWidget {
     );
   }
 
-  // ── Diagnosis header — consistent layout for both healthy and sick ─────────
+  // ── Diagnosis header ───────────────────────────────────────────────────────
   Widget _buildDiagnosisHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
@@ -127,7 +151,6 @@ class ScanDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Status + Confidence row ────────────────────────────────────────
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -174,7 +197,6 @@ class ScanDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              // Confidence badge
               if (data.confidence != null)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -190,10 +212,7 @@ class ScanDetailScreen extends StatelessWidget {
                 ),
             ],
           ),
-
           const SizedBox(height: 14),
-
-          // ── Learn More — Plant button (shown for BOTH healthy and sick) ────
           _buildActionButton(
             icon: Icons.eco_rounded,
             label: 'Learn More about ${data.plantName}',
@@ -202,12 +221,11 @@ class ScanDetailScreen extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => PlantDetailScreen(plantId: data.plantId ?? 999),
+                builder: (_) =>
+                    PlantDetailScreen(plantId: data.plantId ?? 999),
               ),
             ),
           ),
-
-          // ── View Disease button (shown ONLY for sick plants) ───────────────
           if (!data.isHealthy && data.diseaseName != null) ...[
             const SizedBox(height: 10),
             _buildActionButton(
@@ -229,7 +247,6 @@ class ScanDetailScreen extends StatelessWidget {
     );
   }
 
-  // ── Reusable action button used in the header ─────────────────────────────
   Widget _buildActionButton({
     required IconData icon,
     required String label,
@@ -261,8 +278,7 @@ class ScanDetailScreen extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Icon(Icons.arrow_forward_ios_rounded,
-                color: lightColor, size: 13),
+            Icon(Icons.arrow_forward_ios_rounded, color: lightColor, size: 13),
           ],
         ),
       ),
@@ -291,8 +307,7 @@ class ScanDetailScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             data.description ?? '',
-            style: const TextStyle(
-                fontSize: 13, color: _textMuted, height: 1.6),
+            style: const TextStyle(fontSize: 13, color: _textMuted, height: 1.6),
           ),
         ],
       ),
@@ -331,8 +346,7 @@ class ScanDetailScreen extends StatelessWidget {
               widthFactor: fraction,
               child: Container(
                 decoration: BoxDecoration(
-                    color: _accent,
-                    borderRadius: BorderRadius.circular(50)),
+                    color: _accent, borderRadius: BorderRadius.circular(50)),
               ),
             ),
           ),
@@ -545,6 +559,7 @@ class ScanDetailScreen extends StatelessWidget {
         top: false,
         child: Row(
           children: [
+            // Save Report
             Expanded(
               child: GestureDetector(
                 onTap: () {
@@ -580,22 +595,29 @@ class ScanDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
+            // Scan Another → /scan
             Expanded(
               flex: 2,
               child: GestureDetector(
-                onTap: () => Navigator.of(context).pop(),
+                onTap: () => context.go(AppRouter.scan),
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
                     color: _green,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Center(
-                    child: Text('Scan Another',
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white)),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.camera_alt_rounded,
+                          color: Colors.white, size: 18),
+                      SizedBox(width: 8),
+                      Text('Scan Another',
+                          style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white)),
+                    ],
                   ),
                 ),
               ),
@@ -763,16 +785,18 @@ ScanDetailData sampleDetailFromRecord({
     ),
   };
 
-  return diseaseMap[status]?.call() ?? ScanDetailData(
-    plantName: plantName, date: date, time: time, isHealthy: false,
-    diseaseName: status,
-    confidence: 70, severity: 'Moderate',
-    plantId: 999, diseaseId: 999,
-    description: 'A plant disease was detected. Please consult a local plant specialist.',
-    treatments: const [
-      TreatmentStep(title: 'Isolate Plant',  description: 'Move away from other plants to prevent spreading', icon: Icons.format_align_center_outlined),
-      TreatmentStep(title: 'Consult Expert', description: 'Contact a local plant health specialist',          icon: Icons.person_search_outlined),
-    ],
-    tips: ['Monitor the plant daily for changes', 'Avoid over-watering'],
-  );
+  return diseaseMap[status]?.call() ??
+      ScanDetailData(
+        plantName: plantName, date: date, time: time, isHealthy: false,
+        diseaseName: status,
+        confidence: 70, severity: 'Moderate',
+        plantId: 999, diseaseId: 999,
+        description:
+        'A plant disease was detected. Please consult a local plant specialist.',
+        treatments: const [
+          TreatmentStep(title: 'Isolate Plant',  description: 'Move away from other plants to prevent spreading', icon: Icons.format_align_center_outlined),
+          TreatmentStep(title: 'Consult Expert', description: 'Contact a local plant health specialist',          icon: Icons.person_search_outlined),
+        ],
+        tips: ['Monitor the plant daily for changes', 'Avoid over-watering'],
+      );
 }

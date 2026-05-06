@@ -38,59 +38,31 @@ class ScanScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: _bg,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTopBar(context),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTipBanner(),
-                    const SizedBox(height: 20),
-                    _buildTakePhotoBtn(context),
-                    const SizedBox(height: 12),
-                    _buildGalleryBtn(context),
-                    const SizedBox(height: 32),
-                    _buildPhotoTips(),
-                  ],
-                ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Scan Plant',
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: _textPrimary),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              _buildTipBanner(),
+              const SizedBox(height: 20),
+              _buildTakePhotoBtn(context),
+              const SizedBox(height: 12),
+              _buildGalleryBtn(context),
+              const SizedBox(height: 32),
+              _buildPhotoTips(),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: const AppBottomNavBar(currentIndex: 1),
-    );
-  }
-
-  Widget _buildTopBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              width: 38, height: 38,
-              decoration: BoxDecoration(
-                  color: _cardDark,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: _border)),
-              child: const Icon(Icons.arrow_back_rounded,
-                  color: _textMuted, size: 20),
-            ),
-          ),
-          const SizedBox(width: 14),
-          const Text('Scan Plant',
-              style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: _textPrimary)),
-        ],
-      ),
     );
   }
 
@@ -150,7 +122,9 @@ class ScanScreen extends StatelessWidget {
           border: Border.all(color: _green.withOpacity(0.45), width: 1.5),
           boxShadow: [
             BoxShadow(
-                color: _green.withOpacity(0.1), blurRadius: 24, spreadRadius: 2)
+                color: _green.withOpacity(0.1),
+                blurRadius: 24,
+                spreadRadius: 2)
           ],
         ),
         child: Column(
@@ -163,8 +137,8 @@ class ScanScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                       color: _greenLight.withOpacity(0.3), width: 1)),
-              child:
-              const Icon(Icons.camera_alt_rounded, color: _greenLight, size: 28),
+              child: const Icon(Icons.camera_alt_rounded,
+                  color: _greenLight, size: 28),
             ),
             const SizedBox(height: 14),
             const Text('Take Photo',
@@ -197,7 +171,8 @@ class ScanScreen extends StatelessWidget {
             Container(
               width: 60, height: 60,
               decoration: BoxDecoration(
-                  color: _border, borderRadius: BorderRadius.circular(16)),
+                  color: _border,
+                  borderRadius: BorderRadius.circular(16)),
               child: const Icon(Icons.photo_library_outlined,
                   color: _textMuted, size: 28),
             ),
@@ -239,15 +214,16 @@ class ScanScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                  width: 6,
-                  height: 6,
+                  width: 6, height: 6,
                   margin: const EdgeInsets.only(top: 5, right: 10),
                   decoration: const BoxDecoration(
                       color: _green, shape: BoxShape.circle)),
               Expanded(
                   child: Text(tip,
                       style: const TextStyle(
-                          fontSize: 13, color: _textMuted, height: 1.4))),
+                          fontSize: 13,
+                          color: _textMuted,
+                          height: 1.4))),
             ],
           ),
         )),
