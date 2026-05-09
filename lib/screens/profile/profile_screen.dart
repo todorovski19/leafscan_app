@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:leafscan_app/screens/profile/settings_screen.dart';
 import 'package:leafscan_app/screens/profile/edit_profile_screen.dart';
 import 'package:leafscan_app/screens/profile/help_center_screen.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -14,14 +15,16 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _orange      = Color(0xFFE8924A);
-  static const Color _border      = Color(0xFF243028);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark    => _c.cardBg;
+  Color get _headerBg    => _c.headerBg;
+  Color get _green       => _c.green;
+  Color get _greenLight  => _c.greenLight;
+  Color get _textPrimary => _c.textPrimary;
+  Color get _textMuted   => _c.textMuted;
+  Color get _orange      => _c.orange;
+  Color get _border      => _c.border;
 
   static const String _name     = 'Sarah Johnson';
   static const String _bio      = 'Plant Enthusiast 🌿';
@@ -41,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(msg),
-      backgroundColor: error ? const Color(0xFFE05252) : _green,
+      backgroundColor: error ? _c.red : _green,
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ));
@@ -88,14 +91,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shape: BoxShape.circle,
                     border: Border.all(color: _orange.withOpacity(0.35)),
                   ),
-                  child: const Icon(Icons.star_rounded, color: _orange, size: 32),
+                  child: Icon(Icons.star_rounded, color: _orange, size: 32),
                 ),
                 const SizedBox(height: 16),
-                const Text('Enjoying PlantCare AI?',
+                Text('Enjoying PlantCare AI?',
                     style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800, color: _textPrimary)),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Tap a star to rate your experience.',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 13, color: _textMuted, height: 1.4),
@@ -130,7 +133,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Text(
                       _ratingLabel(rating),
                       key: ValueKey(rating),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12, color: _greenLight, fontWeight: FontWeight.w600),
                     ),
                   ),
@@ -145,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text('Maybe Later',
+                        child: Text('Maybe Later',
                             style: TextStyle(color: _textMuted, fontWeight: FontWeight.w600)),
                       ),
                     ),
@@ -203,13 +206,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(color: _border, borderRadius: BorderRadius.circular(2))),
             ListTile(
-              leading: Container(width: 40, height: 40, decoration: BoxDecoration(color: _green.withOpacity(0.15), shape: BoxShape.circle), child: const Icon(Icons.camera_alt_rounded, color: _greenLight, size: 20)),
-              title: const Text('Take a Photo', style: TextStyle(fontWeight: FontWeight.w600, color: _textPrimary)),
+              leading: Container(width: 40, height: 40, decoration: BoxDecoration(color: _green.withOpacity(0.15), shape: BoxShape.circle), child: Icon(Icons.camera_alt_rounded, color: _greenLight, size: 20)),
+              title: Text('Take a Photo', style: TextStyle(fontWeight: FontWeight.w600, color: _textPrimary)),
               onTap: () => Navigator.pop(ctx, ImageSource.camera),
             ),
             ListTile(
-              leading: Container(width: 40, height: 40, decoration: BoxDecoration(color: _green.withOpacity(0.15), shape: BoxShape.circle), child: const Icon(Icons.photo_library_rounded, color: _greenLight, size: 20)),
-              title: const Text('Choose from Gallery', style: TextStyle(fontWeight: FontWeight.w600, color: _textPrimary)),
+              leading: Container(width: 40, height: 40, decoration: BoxDecoration(color: _green.withOpacity(0.15), shape: BoxShape.circle), child: Icon(Icons.photo_library_rounded, color: _greenLight, size: 20)),
+              title: Text('Choose from Gallery', style: TextStyle(fontWeight: FontWeight.w600, color: _textPrimary)),
               onTap: () => Navigator.pop(ctx, ImageSource.gallery),
             ),
             const SizedBox(height: 8),
@@ -262,7 +265,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(color: Color(0xFF1A211D), border: Border(bottom: BorderSide(color: Color(0xFF243028), width: 1))),
+      decoration: BoxDecoration(color: _headerBg, border: Border(bottom: BorderSide(color: _border, width: 1))),
       child: SafeArea(
         bottom: false,
         child: Padding(
@@ -270,13 +273,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Profile', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: _textPrimary)),
+              Text('Profile', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: _textPrimary)),
               GestureDetector(
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
                 child: Container(
                   width: 38, height: 38,
                   decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(10), border: Border.all(color: _border)),
-                  child: const Icon(Icons.settings_outlined, color: _textMuted, size: 20),
+                  child: Icon(Icons.settings_outlined, color: _textMuted, size: 20),
                 ),
               ),
             ],
@@ -295,9 +298,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildAvatar(),
           const SizedBox(width: 16),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(_name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _textPrimary)),
+            Text(_name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _textPrimary)),
             const SizedBox(height: 2),
-            Text(_bio, style: const TextStyle(fontSize: 14, color: _textMuted)),
+            Text(_bio, style: TextStyle(fontSize: 14, color: _textMuted)),
           ]),
         ]),
         const SizedBox(height: 20),
@@ -330,13 +333,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         clipBehavior: Clip.antiAlias,
         child: _profileImage != null
             ? Image.file(_profileImage!, fit: BoxFit.cover)
-            : const Icon(Icons.eco_rounded, color: _greenLight, size: 36),
+            : Icon(Icons.eco_rounded, color: _greenLight, size: 36),
       ),
       Positioned(
         bottom: 0, right: 0,
         child: GestureDetector(
           onTap: _pickImage,
-          child: Container(width: 26, height: 26, decoration: const BoxDecoration(color: _orange, shape: BoxShape.circle),
+          child: Container(width: 26, height: 26, decoration: BoxDecoration(color: _orange, shape: BoxShape.circle),
               child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 13)),
         ),
       ),
@@ -345,7 +348,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _infoRow(IconData icon, String text) => Row(children: [
     Icon(icon, size: 16, color: _textMuted), const SizedBox(width: 10),
-    Text(text, style: const TextStyle(fontSize: 13, color: _textMuted)),
+    Text(text, style: TextStyle(fontSize: 13, color: _textMuted)),
   ]);
 
   Widget _buildStatsRow() {
@@ -366,14 +369,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Container(width: 40, height: 40, decoration: BoxDecoration(color: color.withOpacity(0.13), shape: BoxShape.circle, border: Border.all(color: color.withOpacity(0.25))),
             child: Icon(icon, color: color, size: 18)),
         const SizedBox(height: 10),
-        Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _textPrimary)),
+        Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _textPrimary)),
         const SizedBox(height: 2),
-        Text(label, style: const TextStyle(fontSize: 11, color: _textMuted), textAlign: TextAlign.center),
+        Text(label, style: TextStyle(fontSize: 11, color: _textMuted), textAlign: TextAlign.center),
       ]),
     );
   }
 
-  Widget _sectionLabel(String title) => Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: _textPrimary));
+  Widget _sectionLabel(String title) => Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: _textPrimary));
 
   Widget _buildAchievementCard(_Achievement a) {
     return Container(
@@ -384,9 +387,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Icon(a.icon, color: a.iconColor, size: 20)),
         const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(a.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _textPrimary)),
+          Text(a.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _textPrimary)),
           const SizedBox(height: 2),
-          Text(a.subtitle, style: const TextStyle(fontSize: 12, color: _textMuted)),
+          Text(a.subtitle, style: TextStyle(fontSize: 12, color: _textMuted)),
         ])),
         const Text('🏆', style: TextStyle(fontSize: 20)),
       ]),
@@ -401,11 +404,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(16), border: Border.all(color: _border, width: 1)),
         child: Row(children: [
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _textPrimary)),
+            Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _textPrimary)),
             const SizedBox(height: 2),
-            Text(subtitle, style: const TextStyle(fontSize: 12, color: _textMuted)),
+            Text(subtitle, style: TextStyle(fontSize: 12, color: _textMuted)),
           ])),
-          const Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),
+          Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),
         ]),
       ),
     );

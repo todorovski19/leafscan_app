@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:leafscan_app/models/plant_model.dart';
 import 'package:leafscan_app/models/treatment_model.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 class PlantDetailScreen extends StatefulWidget {
   final int plantId;
@@ -11,15 +12,17 @@ class PlantDetailScreen extends StatefulWidget {
 }
 
 class _PlantDetailScreenState extends State<PlantDetailScreen> {
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _orange      = Color(0xFFE8924A);
-  static const Color _border      = Color(0xFF243028);
-  static const Color _red         = Color(0xFFE05252);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark          => _c.cardBg;
+  Color get _green          => _c.green;
+  Color get _greenLight          => _c.greenLight;
+  Color get _textPrimary          => _c.textPrimary;
+  Color get _textMuted          => _c.textMuted;
+  Color get _orange          => _c.orange;
+  Color get _border          => _c.border;
+  Color get _red          => _c.red;
+  Color get _headerBg    => _c.headerBg;
 
   PlantModel? _plant;
   bool _isLoading = true;
@@ -102,8 +105,8 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
       children: [
         const Icon(Icons.error_outline_rounded, color: Color(0xFFE05252), size: 48),
         const SizedBox(height: 16),
-        const Text('Could not load plant info',
-            style: TextStyle(color: Color(0xFFF0EDE6), fontSize: 16)),
+        Text('Could not load plant info',
+            style: TextStyle(color: _textPrimary, fontSize: 16)),
         const SizedBox(height: 20),
         TextButton(
           onPressed: () { setState(() => _isLoading = true); _loadPlant(); },
@@ -157,19 +160,19 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
             color: _bg.withOpacity(0.7),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.arrow_back_rounded,
-              color: Color(0xFFF0EDE6), size: 20),
+          child: Icon(Icons.arrow_back_rounded,
+              color: _textPrimary, size: 20),
         ),
       ),
       flexibleSpace: FlexibleSpaceBar(
         title: Text(plant.name,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.w700,
-                color: Color(0xFFF0EDE6))),
+                color: _textPrimary)),
         background: plant.image != null
             ? Container(color: _cardDark,
-                child: const Center(child: Icon(Icons.image_outlined,
-                    color: Color(0xFF7A9080), size: 64)))
+                child: Center(child: Icon(Icons.image_outlined,
+                    color: _textMuted, size: 64)))
             : Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -207,11 +210,11 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.science_outlined, color: Color(0xFF7A9080), size: 16),
+          Icon(Icons.science_outlined, color: _textMuted, size: 16),
           const SizedBox(width: 8),
           Text(plant.scientificName,
-              style: const TextStyle(
-                  fontSize: 13, color: Color(0xFF7A9080),
+              style: TextStyle(
+                  fontSize: 13, color: _textMuted,
                   fontStyle: FontStyle.italic)),
         ],
       ),
@@ -260,9 +263,9 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 15, fontWeight: FontWeight.w700,
-                color: Color(0xFFF0EDE6))),
+                color: _textPrimary)),
         const SizedBox(height: 10),
         Container(
           width: double.infinity,
@@ -273,8 +276,8 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
             border: Border.all(color: _border, width: 1),
           ),
           child: Text(content,
-              style: const TextStyle(
-                  fontSize: 14, color: Color(0xFF7A9080), height: 1.6)),
+              style: TextStyle(
+                  fontSize: 14, color: _textMuted, height: 1.6)),
         ),
       ],
     );
@@ -287,10 +290,10 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
       children: [
         Row(
           children: [
-            const Text('Top Diseases',
+            Text('Top Diseases',
                 style: TextStyle(
                     fontSize: 15, fontWeight: FontWeight.w700,
-                    color: Color(0xFFF0EDE6))),
+                    color: _textPrimary)),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -356,9 +359,9 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(disease.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 14, fontWeight: FontWeight.w600,
-                                color: Color(0xFFF0EDE6))),
+                                color: _textPrimary)),
                         const SizedBox(height: 4),
                         Row(
                           children: [
@@ -380,9 +383,9 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
                             ),
                             const SizedBox(width: 6),
                             Text(disease.category,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontSize: 11,
-                                    color: Color(0xFF7A9080))),
+                                    color: _textMuted)),
                           ],
                         ),
                       ],
@@ -391,8 +394,8 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
                   AnimatedRotation(
                     turns: isExpanded ? 0.5 : 0,
                     duration: const Duration(milliseconds: 200),
-                    child: const Icon(Icons.keyboard_arrow_down_rounded,
-                        color: Color(0xFF7A9080), size: 22),
+                    child: Icon(Icons.keyboard_arrow_down_rounded,
+                        color: _textMuted, size: 22),
                   ),
                 ],
               ),
@@ -414,11 +417,11 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
                       children: [
                         Divider(color: _border, height: 1),
                         const SizedBox(height: 12),
-                        const Text('Treatments',
+                        Text('Treatments',
                             style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF7A9080),
+                                color: _textMuted,
                                 letterSpacing: 0.4)),
                         const SizedBox(height: 10),
                         ...disease.treatments.map(
@@ -464,13 +467,13 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(treatment.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 13, fontWeight: FontWeight.w600,
-                        color: Color(0xFFF0EDE6))),
+                        color: _textPrimary)),
                 const SizedBox(height: 3),
                 Text(treatment.description,
-                    style: const TextStyle(
-                        fontSize: 12, color: Color(0xFF7A9080),
+                    style: TextStyle(
+                        fontSize: 12, color: _textMuted,
                         height: 1.4)),
               ],
             ),

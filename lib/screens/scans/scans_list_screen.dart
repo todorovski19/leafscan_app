@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 enum ScanFilter { all, healthy, ill }
 
@@ -12,14 +13,16 @@ class ScansListScreen extends StatefulWidget {
 }
 
 class _ScansListScreenState extends State<ScansListScreen> {
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _orange      = Color(0xFFE8924A);
-  static const Color _border      = Color(0xFF243028);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark          => _c.cardBg;
+  Color get _green          => _c.green;
+  Color get _greenLight          => _c.greenLight;
+  Color get _textPrimary          => _c.textPrimary;
+  Color get _textMuted          => _c.textMuted;
+  Color get _orange          => _c.orange;
+  Color get _border          => _c.border;
+  Color get _headerBg    => _c.headerBg;
 
   static const List<_ScanRecord> _allScans = [
     _ScanRecord(plantName: 'Tomato Plant',  date: 'Mar 20, 2026', time: '10:30 AM', status: 'Healthy',        isHealthy: true,  diseaseId: null),
@@ -103,9 +106,9 @@ class _ScansListScreenState extends State<ScansListScreen> {
 
   Widget _buildHeader(BuildContext context, int count) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF1A211D),
-        border: Border(bottom: BorderSide(color: Color(0xFF243028), width: 1)),
+      decoration: BoxDecoration(
+        color: _headerBg,
+        border: Border(bottom: BorderSide(color: _border, width: 1)),
       ),
       child: SafeArea(
         bottom: false,
@@ -125,11 +128,11 @@ class _ScansListScreenState extends State<ScansListScreen> {
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: _border),
                       ),
-                      child: const Icon(Icons.arrow_back_rounded, color: _textMuted, size: 20),
+                      child: Icon(Icons.arrow_back_rounded, color: _textMuted, size: 20),
                     ),
                   ),
                   const SizedBox(width: 14),
-                  Text(_title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: _textPrimary)),
+                  Text(_title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: _textPrimary)),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -159,15 +162,15 @@ class _ScansListScreenState extends State<ScansListScreen> {
                 child: TextField(
                   controller: _searchCtrl,
                   onChanged: (v) => setState(() => _searchQuery = v),
-                  style: const TextStyle(fontSize: 14, color: _textPrimary),
+                  style: TextStyle(fontSize: 14, color: _textPrimary),
                   decoration: InputDecoration(
                     hintText: 'Search plants...',
-                    hintStyle: const TextStyle(color: _textMuted, fontSize: 14),
-                    prefixIcon: const Icon(Icons.search_rounded, color: _textMuted, size: 20),
+                    hintStyle: TextStyle(color: _textMuted, fontSize: 14),
+                    prefixIcon: Icon(Icons.search_rounded, color: _textMuted, size: 20),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? GestureDetector(
                       onTap: () { _searchCtrl.clear(); setState(() => _searchQuery = ''); },
-                      child: const Icon(Icons.close_rounded, color: _textMuted, size: 18),
+                      child: Icon(Icons.close_rounded, color: _textMuted, size: 18),
                     )
                         : null,
                     border: InputBorder.none,
@@ -222,9 +225,9 @@ class _ScansListScreenState extends State<ScansListScreen> {
                   Text(scan.plantName, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: scan.isHealthy ? _greenLight : _orange)),
                   const SizedBox(height: 4),
                   Row(children: [
-                    const Icon(Icons.calendar_today_outlined, size: 11, color: _textMuted),
+                    Icon(Icons.calendar_today_outlined, size: 11, color: _textMuted),
                     const SizedBox(width: 4),
-                    Text('${scan.date} · ${scan.time}', style: const TextStyle(fontSize: 11, color: _textMuted)),
+                    Text('${scan.date} · ${scan.time}', style: TextStyle(fontSize: 11, color: _textMuted)),
                   ]),
                   const SizedBox(height: 8),
                   Container(
@@ -239,7 +242,7 @@ class _ScansListScreenState extends State<ScansListScreen> {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),
+            Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),
           ],
         ),
       ),
@@ -261,9 +264,9 @@ class _ScansListScreenState extends State<ScansListScreen> {
             child: Icon(Icons.search_off_rounded, color: _accentColor, size: 32),
           ),
           const SizedBox(height: 16),
-          const Text('No plants found', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: _textPrimary)),
+          Text('No plants found', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: _textPrimary)),
           const SizedBox(height: 6),
-          const Text('Try a different search', style: TextStyle(fontSize: 13, color: _textMuted)),
+          Text('Try a different search', style: TextStyle(fontSize: 13, color: _textMuted)),
         ],
       ),
     );

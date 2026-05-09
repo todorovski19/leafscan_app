@@ -3,6 +3,7 @@ import 'package:leafscan_app/models/disease_model.dart';
 import 'package:leafscan_app/models/treatment_model.dart';
 import 'package:leafscan_app/models/plant_simple_model.dart';
 import 'package:leafscan_app/screens/plant/plant_detail_screen.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 class DiseaseDetailScreen extends StatefulWidget {
   final int diseaseId;
@@ -13,15 +14,17 @@ class DiseaseDetailScreen extends StatefulWidget {
 }
 
 class _DiseaseDetailScreenState extends State<DiseaseDetailScreen> {
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _orange      = Color(0xFFE8924A);
-  static const Color _border      = Color(0xFF243028);
-  static const Color _red         = Color(0xFFE05252);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark          => _c.cardBg;
+  Color get _green          => _c.green;
+  Color get _greenLight          => _c.greenLight;
+  Color get _textPrimary          => _c.textPrimary;
+  Color get _textMuted          => _c.textMuted;
+  Color get _orange          => _c.orange;
+  Color get _border          => _c.border;
+  Color get _red          => _c.red;
+  Color get _headerBg    => _c.headerBg;
 
   DiseaseModel? _disease;
   bool _isLoading = true;
@@ -91,8 +94,8 @@ class _DiseaseDetailScreenState extends State<DiseaseDetailScreen> {
       children: [
         const Icon(Icons.error_outline_rounded, color: Color(0xFFE05252), size: 48),
         const SizedBox(height: 16),
-        const Text('Could not load disease info',
-            style: TextStyle(color: Color(0xFFF0EDE6), fontSize: 16)),
+        Text('Could not load disease info',
+            style: TextStyle(color: _textPrimary, fontSize: 16)),
         const SizedBox(height: 20),
         TextButton(
           onPressed: () { setState(() => _isLoading = true); _loadDisease(); },
@@ -144,20 +147,20 @@ class _DiseaseDetailScreenState extends State<DiseaseDetailScreen> {
             color: _bg.withOpacity(0.7),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.arrow_back_rounded,
-              color: Color(0xFFF0EDE6), size: 20),
+          child: Icon(Icons.arrow_back_rounded,
+              color: _textPrimary, size: 20),
         ),
       ),
       flexibleSpace: FlexibleSpaceBar(
         title: Text(disease.name,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 16, fontWeight: FontWeight.w700,
-                color: Color(0xFFF0EDE6))),
+                color: _textPrimary)),
         background: disease.image != null
             ? Container(
             color: _cardDark,
-            child: const Center(child: Icon(Icons.image_outlined,
-                color: Color(0xFF7A9080), size: 64)))
+            child: Center(child: Icon(Icons.image_outlined,
+                color: _textMuted, size: 64)))
             : Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -234,8 +237,8 @@ class _DiseaseDetailScreenState extends State<DiseaseDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title,
-            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
-                color: Color(0xFFF0EDE6))),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
+                color: _textPrimary)),
         const SizedBox(height: 10),
         Container(
           width: double.infinity,
@@ -246,7 +249,7 @@ class _DiseaseDetailScreenState extends State<DiseaseDetailScreen> {
             border: Border.all(color: _border, width: 1),
           ),
           child: Text(content,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF7A9080),
+              style: TextStyle(fontSize: 14, color: _textMuted,
                   height: 1.6)),
         ),
       ],
@@ -261,9 +264,9 @@ class _DiseaseDetailScreenState extends State<DiseaseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Treatments',
+        Text('Treatments',
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
-                color: Color(0xFFF0EDE6))),
+                color: _textPrimary)),
         const SizedBox(height: 12),
         if (mechanical.isNotEmpty) ...[
           _treatmentGroupLabel('MECHANICAL', _textMuted),
@@ -326,11 +329,11 @@ class _DiseaseDetailScreenState extends State<DiseaseDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(treatment.name,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600,
-                        color: Color(0xFFF0EDE6))),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600,
+                        color: _textPrimary)),
                 const SizedBox(height: 4),
                 Text(treatment.description,
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF7A9080),
+                    style: TextStyle(fontSize: 12, color: _textMuted,
                         height: 1.5)),
               ],
             ),
@@ -344,9 +347,9 @@ class _DiseaseDetailScreenState extends State<DiseaseDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Most Affected Plants',
+        Text('Most Affected Plants',
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700,
-                color: Color(0xFFF0EDE6))),
+                color: _textPrimary)),
         const SizedBox(height: 12),
         ...plants.map((plant) => Padding(
           padding: const EdgeInsets.only(bottom: 10),
@@ -372,8 +375,8 @@ class _DiseaseDetailScreenState extends State<DiseaseDetailScreen> {
               Icon(Icons.eco_rounded, color: _greenLight, size: 14),
               const SizedBox(width: 6),
               Text(plant.name,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500,
-                      color: Color(0xFFF0EDE6))),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500,
+                      color: _textPrimary)),
             ],
           ),
         ),

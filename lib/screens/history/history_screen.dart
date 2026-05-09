@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
 import 'package:leafscan_app/screens/plant/plant_detail_screen.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 
 class HistoryScreen extends StatefulWidget {
@@ -11,14 +12,16 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _orange      = Color(0xFFE8924A);
-  static const Color _border      = Color(0xFF243028);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark          => _c.cardBg;
+  Color get _green          => _c.green;
+  Color get _greenLight          => _c.greenLight;
+  Color get _textPrimary          => _c.textPrimary;
+  Color get _textMuted          => _c.textMuted;
+  Color get _orange          => _c.orange;
+  Color get _border          => _c.border;
+  Color get _headerBg    => _c.headerBg;
 
   static const List<_ScanRecord> _allScans = [
     _ScanRecord(plantName: 'Tomato Plant',  date: 'Mar 20, 2026', time: '10:30 AM', status: 'Healthy',        isHealthy: true,  diseaseId: null, plantId: 999),
@@ -116,9 +119,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Widget _buildHeader() {
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF1A211D),
-        border: Border(bottom: BorderSide(color: Color(0xFF243028), width: 1)),
+      decoration: BoxDecoration(
+        color: _headerBg,
+        border: Border(bottom: BorderSide(color: _border, width: 1)),
       ),
       child: SafeArea(
         bottom: false,
@@ -127,7 +130,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Scan History', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: _textPrimary)),
+              Text('Scan History', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: _textPrimary)),
               const SizedBox(height: 14),
               Container(
                 height: 46,
@@ -135,13 +138,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 child: TextField(
                   controller: _searchCtrl,
                   onChanged: (v) => setState(() => _searchQuery = v),
-                  style: const TextStyle(fontSize: 14, color: _textPrimary),
+                  style: TextStyle(fontSize: 14, color: _textPrimary),
                   decoration: InputDecoration(
                     hintText: 'Search plants...',
-                    hintStyle: const TextStyle(color: _textMuted, fontSize: 14),
-                    prefixIcon: const Icon(Icons.search_rounded, color: _textMuted, size: 20),
+                    hintStyle: TextStyle(color: _textMuted, fontSize: 14),
+                    prefixIcon: Icon(Icons.search_rounded, color: _textMuted, size: 20),
                     suffixIcon: _searchQuery.isNotEmpty
-                        ? GestureDetector(onTap: () { _searchCtrl.clear(); setState(() => _searchQuery = ''); }, child: const Icon(Icons.close_rounded, color: _textMuted, size: 18))
+                        ? GestureDetector(onTap: () { _searchCtrl.clear(); setState(() => _searchQuery = ''); }, child: Icon(Icons.close_rounded, color: _textMuted, size: 18))
                         : null,
                     border: InputBorder.none, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 13), filled: false,
@@ -166,11 +169,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Monthly Scans', style: TextStyle(fontSize: 12, color: _greenLight, fontWeight: FontWeight.w500)),
-                Text('$_totalCount', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w700, color: _textPrimary, height: 1.1)),
+                Text('Monthly Scans', style: TextStyle(fontSize: 12, color: _greenLight, fontWeight: FontWeight.w500)),
+                Text('$_totalCount', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w700, color: _textPrimary, height: 1.1)),
               ]),
               Container(width: 36, height: 36, decoration: BoxDecoration(color: _green.withOpacity(0.15), shape: BoxShape.circle, border: Border.all(color: _green.withOpacity(0.3))),
-                  child: const Icon(Icons.trending_up_rounded, color: _greenLight, size: 18)),
+                  child: Icon(Icons.trending_up_rounded, color: _greenLight, size: 18)),
             ],
           ),
           const SizedBox(height: 20),
@@ -186,7 +189,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                     Container(height: h, decoration: BoxDecoration(color: _green.withOpacity(0.5), borderRadius: BorderRadius.circular(8), border: Border.all(color: _greenLight.withOpacity(0.3), width: 1))),
                     const SizedBox(height: 6),
-                    Text(data.month, style: const TextStyle(fontSize: 12, color: _textMuted)),
+                    Text(data.month, style: TextStyle(fontSize: 12, color: _textMuted)),
                   ]),
                 ));
               }).toList(),
@@ -295,10 +298,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   const SizedBox(height: 4),
                   // Date
                   Row(children: [
-                    const Icon(Icons.calendar_today_outlined, size: 11, color: _textMuted),
+                    Icon(Icons.calendar_today_outlined, size: 11, color: _textMuted),
                     const SizedBox(width: 4),
                     Text('${scan.date} · ${scan.time}',
-                        style: const TextStyle(fontSize: 11, color: _textMuted)),
+                        style: TextStyle(fontSize: 11, color: _textMuted)),
                   ]),
                   const SizedBox(height: 8),
                   // Status badge
@@ -319,7 +322,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),
+            Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),
           ],
         ),
       ),
@@ -331,11 +334,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
       padding: const EdgeInsets.symmetric(vertical: 48),
       child: Center(child: Column(children: [
         Container(width: 64, height: 64, decoration: BoxDecoration(color: _green.withOpacity(0.1), shape: BoxShape.circle, border: Border.all(color: _green.withOpacity(0.2))),
-            child: const Icon(Icons.search_off_rounded, color: _greenLight, size: 30)),
+            child: Icon(Icons.search_off_rounded, color: _greenLight, size: 30)),
         const SizedBox(height: 16),
-        const Text('No plants found', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: _textPrimary)),
+        Text('No plants found', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: _textPrimary)),
         const SizedBox(height: 6),
-        const Text('Try a different search or filter', style: TextStyle(fontSize: 13, color: _textMuted)),
+        Text('Try a different search or filter', style: TextStyle(fontSize: 13, color: _textMuted)),
       ])),
     );
   }

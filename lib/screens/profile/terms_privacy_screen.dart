@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 class TermsPrivacyScreen extends StatefulWidget {
   const TermsPrivacyScreen({super.key});
@@ -9,13 +10,15 @@ class TermsPrivacyScreen extends StatefulWidget {
 
 class _TermsPrivacyScreenState extends State<TermsPrivacyScreen>
     with SingleTickerProviderStateMixin {
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _border      = Color(0xFF243028);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark          => _c.cardBg;
+  Color get _green          => _c.green;
+  Color get _greenLight          => _c.greenLight;
+  Color get _textPrimary          => _c.textPrimary;
+  Color get _textMuted          => _c.textMuted;
+  Color get _border          => _c.border;
+  Color get _headerBg    => _c.headerBg;
 
   static const String _lastUpdated = 'Last updated: May 9, 2026';
 
@@ -55,9 +58,9 @@ class _TermsPrivacyScreenState extends State<TermsPrivacyScreen>
   }
 
   Widget _buildHeader() => Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF1A211D),
-          border: Border(bottom: BorderSide(color: Color(0xFF243028), width: 1)),
+        decoration: BoxDecoration(
+          color: _headerBg,
+          border: Border(bottom: BorderSide(color: _border, width: 1)),
         ),
         child: SafeArea(
           bottom: false,
@@ -76,11 +79,11 @@ class _TermsPrivacyScreenState extends State<TermsPrivacyScreen>
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: _border),
                       ),
-                      child: const Icon(Icons.arrow_back_rounded, color: _textMuted, size: 20),
+                      child: Icon(Icons.arrow_back_rounded, color: _textMuted, size: 20),
                     ),
                   ),
                   const SizedBox(width: 14),
-                  const Text('Terms & Privacy',
+                  Text('Terms & Privacy',
                       style: TextStyle(
                           fontSize: 20, fontWeight: FontWeight.w700, color: _textPrimary)),
                 ]),
@@ -115,10 +118,10 @@ class _TermsPrivacyScreenState extends State<TermsPrivacyScreen>
             border: Border.all(color: _green.withOpacity(0.25)),
           ),
           child: Row(children: [
-            const Icon(Icons.update_rounded, color: _greenLight, size: 16),
+            Icon(Icons.update_rounded, color: _greenLight, size: 16),
             const SizedBox(width: 10),
             Text(_lastUpdated,
-                style: const TextStyle(fontSize: 12, color: _greenLight, fontWeight: FontWeight.w600)),
+                style: TextStyle(fontSize: 12, color: _greenLight, fontWeight: FontWeight.w600)),
           ]),
         ),
         const SizedBox(height: 20),
@@ -127,7 +130,7 @@ class _TermsPrivacyScreenState extends State<TermsPrivacyScreen>
         Center(
           child: Text(
             'PlantCare AI · v1.0.0',
-            style: const TextStyle(fontSize: 11, color: _textMuted),
+            style: TextStyle(fontSize: 11, color: _textMuted),
           ),
         ),
       ],
@@ -139,11 +142,11 @@ class _TermsPrivacyScreenState extends State<TermsPrivacyScreen>
       padding: const EdgeInsets.only(bottom: 18),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(s.title,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 15, fontWeight: FontWeight.w800, color: _textPrimary)),
         const SizedBox(height: 8),
         Text(s.body,
-            style: const TextStyle(fontSize: 13, color: _textMuted, height: 1.55)),
+            style: TextStyle(fontSize: 13, color: _textMuted, height: 1.55)),
       ]),
     );
   }

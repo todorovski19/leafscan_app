@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/theme/app_theme.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AuthScreen — modern sleek login
@@ -27,14 +28,16 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   // ── Colours ────────────────────────────────────────────────────────────────
-  static const Color _bg         = Color(0xFF181F1B);
-  static const Color _card       = Color(0xFF1E2923);
-  static const Color _inputBg    = Color(0xFF243028);
-  static const Color _border     = Color(0xFF2E3D33);
-  static const Color _green      = Color(0xFF5C9E78);
-  static const Color _greenLight = Color(0xFF7CC49A);
-  static const Color _textPrimary= Color(0xFFF0EDE6);
-  static const Color _textMuted  = Color(0xFF7A9080);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _card        => _c.cardBg;
+  Color get _inputBg     => _c.inputBg;
+  Color get _border      => _c.border;
+  Color get _green       => _c.green;
+  Color get _greenLight  => _c.greenLight;
+  Color get _headerBg    => _c.headerBg;
+  Color get _textPrimary => _c.textPrimary;
+  Color get _textMuted   => _c.textMuted;
 
   @override
   Widget build(BuildContext context) {
@@ -76,11 +79,11 @@ class _AuthScreenState extends State<AuthScreen> {
         // Green accent dot
         Container(
           width: 8, height: 8,
-          decoration: const BoxDecoration(color: _greenLight, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: _greenLight, shape: BoxShape.circle),
         ),
         const SizedBox(height: 16),
         RichText(
-          text: const TextSpan(
+          text: TextSpan(
             style: TextStyle(fontSize: 38, height: 1.15, fontWeight: FontWeight.w800, color: _textPrimary, letterSpacing: -1.0),
             children: [
               TextSpan(text: 'Ready to\nheal your\n'),
@@ -89,7 +92,7 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         ),
         const SizedBox(height: 14),
-        const Text(
+        Text(
           'Sign in to diagnose, track and cure\nyour plants with AI.',
           style: TextStyle(fontSize: 14, color: _textMuted, height: 1.6),
         ),
@@ -132,7 +135,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Widget _label(String text) => Text(
     text,
-    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _textMuted, letterSpacing: 0.5),
+    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _textMuted, letterSpacing: 0.5),
   );
 
   Widget _inputField({
@@ -154,10 +157,10 @@ class _AuthScreenState extends State<AuthScreen> {
         controller: controller,
         obscureText: obscure,
         keyboardType: keyboardType,
-        style: const TextStyle(fontSize: 15, color: _textPrimary),
+        style: TextStyle(fontSize: 15, color: _textPrimary),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: _textMuted, fontSize: 15),
+          hintStyle: TextStyle(color: _textMuted, fontSize: 15),
           prefixIcon: Icon(icon, color: _textMuted, size: 19),
           suffixIcon: suffix != null ? Padding(padding: const EdgeInsets.only(right: 14), child: suffix) : null,
           suffixIconConstraints: const BoxConstraints(),
@@ -197,7 +200,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return Center(
       child: GestureDetector(
         onTap: () {},
-        child: const Text(
+        child: Text(
           'Forgot your password?',
           style: TextStyle(fontSize: 13, color: _greenLight, fontWeight: FontWeight.w500),
         ),
@@ -210,7 +213,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return Row(
       children: [
         Expanded(child: Container(height: 1, color: _border)),
-        const Padding(
+        Padding(
           padding: EdgeInsets.symmetric(horizontal: 14),
           child: Text('or', style: TextStyle(fontSize: 13, color: _textMuted)),
         ),
@@ -231,12 +234,12 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
       child: Column(
         children: [
-          const Text(
+          Text(
             'New to PlantCare AI?',
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: _textPrimary),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Create a free account and start healing your plants today.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 13, color: _textMuted, height: 1.4),
@@ -249,7 +252,7 @@ class _AuthScreenState extends State<AuthScreen> {
               onPressed: () => _showRegisterSheet(),
               style: OutlinedButton.styleFrom(
                 foregroundColor: _greenLight,
-                side: const BorderSide(color: _green, width: 1.3),
+                side: BorderSide(color: _green, width: 1.3),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: const Text(
@@ -287,9 +290,9 @@ class _AuthScreenState extends State<AuthScreen> {
               // Handle
               Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: _border, borderRadius: BorderRadius.circular(2)))),
               const SizedBox(height: 24),
-              const Text('Create Account', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: _textPrimary)),
+              Text('Create Account', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: _textPrimary)),
               const SizedBox(height: 6),
-              const Text('Join thousands healing their plants.', style: TextStyle(fontSize: 13, color: _textMuted)),
+              Text('Join thousands healing their plants.', style: TextStyle(fontSize: 13, color: _textMuted)),
               const SizedBox(height: 28),
               _label('Full Name'),
               const SizedBox(height: 8),
@@ -339,12 +342,12 @@ class _AuthScreenState extends State<AuthScreen> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-        style: const TextStyle(fontSize: 11.5, color: _textMuted, height: 1.6),
+        style: TextStyle(fontSize: 11.5, color: _textMuted, height: 1.6),
         children: [
           const TextSpan(text: 'By continuing, you agree to our '),
-          TextSpan(text: 'Terms', style: const TextStyle(color: _greenLight, fontWeight: FontWeight.w500)),
+          TextSpan(text: 'Terms', style: TextStyle(color: _greenLight, fontWeight: FontWeight.w500)),
           const TextSpan(text: ' and '),
-          TextSpan(text: 'Privacy Policy', style: const TextStyle(color: _greenLight, fontWeight: FontWeight.w500)),
+          TextSpan(text: 'Privacy Policy', style: TextStyle(color: _greenLight, fontWeight: FontWeight.w500)),
         ],
       ),
     );

@@ -3,19 +3,26 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
-class ScanScreen extends StatelessWidget {
+class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
 
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _orange      = Color(0xFFE8924A);
-  static const Color _border      = Color(0xFF243028);
-  static const Color _orangeBg    = Color(0xFF2A1F15);
+  @override
+  State<ScanScreen> createState() => _ScanScreenState();
+}
+
+class _ScanScreenState extends State<ScanScreen> {
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark    => _c.cardBg;
+  Color get _green       => _c.green;
+  Color get _greenLight  => _c.greenLight;
+  Color get _textPrimary => _c.textPrimary;
+  Color get _textMuted   => _c.textMuted;
+  Color get _orange      => _c.orange;
+  Color get _border      => _c.border;
+  Color get _orangeBg    => _c.orange.withOpacity(0.12);
 
   Future<void> _takePhoto(BuildContext context) async {
     final XFile? photo = await ImagePicker()
@@ -43,7 +50,7 @@ class ScanScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Scan Plant',
                 style: TextStyle(
                     fontSize: 24,
@@ -82,11 +89,11 @@ class ScanScreen extends StatelessWidget {
             width: 32, height: 32,
             decoration: BoxDecoration(
                 color: _orange.withOpacity(0.15), shape: BoxShape.circle),
-            child: const Icon(Icons.tips_and_updates_outlined,
+            child: Icon(Icons.tips_and_updates_outlined,
                 color: _orange, size: 17),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -101,7 +108,7 @@ class ScanScreen extends StatelessWidget {
                         'Make sure the entire leaf is visible.',
                     style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF9A6030),
+                        color: _textMuted,
                         height: 1.4)),
               ],
             ),
@@ -137,17 +144,17 @@ class ScanScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                       color: _greenLight.withOpacity(0.3), width: 1)),
-              child: const Icon(Icons.camera_alt_rounded,
+              child: Icon(Icons.camera_alt_rounded,
                   color: _greenLight, size: 28),
             ),
             const SizedBox(height: 14),
-            const Text('Take Photo',
+            Text('Take Photo',
                 style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
                     color: _textPrimary)),
             const SizedBox(height: 4),
-            const Text('Use your camera to capture',
+            Text('Use your camera to capture',
                 style: TextStyle(fontSize: 12, color: _textMuted)),
           ],
         ),
@@ -173,17 +180,17 @@ class ScanScreen extends StatelessWidget {
               decoration: BoxDecoration(
                   color: _border,
                   borderRadius: BorderRadius.circular(16)),
-              child: const Icon(Icons.photo_library_outlined,
+              child: Icon(Icons.photo_library_outlined,
                   color: _textMuted, size: 28),
             ),
             const SizedBox(height: 14),
-            const Text('Upload from Gallery',
+            Text('Upload from Gallery',
                 style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
                     color: _textPrimary)),
             const SizedBox(height: 4),
-            const Text('Choose from your photos',
+            Text('Choose from your photos',
                 style: TextStyle(fontSize: 12, color: _textMuted)),
           ],
         ),
@@ -201,7 +208,7 @@ class ScanScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Photography Tips',
+        Text('Photography Tips',
             style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -216,11 +223,11 @@ class ScanScreen extends StatelessWidget {
               Container(
                   width: 6, height: 6,
                   margin: const EdgeInsets.only(top: 5, right: 10),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                       color: _green, shape: BoxShape.circle)),
               Expanded(
                   child: Text(tip,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 13,
                           color: _textMuted,
                           height: 1.4))),

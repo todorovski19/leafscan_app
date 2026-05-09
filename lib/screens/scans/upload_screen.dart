@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 class UploadScreen extends StatefulWidget {
   final String imagePath;
@@ -14,13 +15,15 @@ class UploadScreen extends StatefulWidget {
 }
 
 class _UploadScreenState extends State<UploadScreen> {
-  static const Color _bg         = Color(0xFF161C18);
-  static const Color _cardDark   = Color(0xFF1E2923);
-  static const Color _green      = Color(0xFF5C9E78);
-  static const Color _greenLight = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted  = Color(0xFF7A9080);
-  static const Color _border     = Color(0xFF243028);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark          => _c.cardBg;
+  Color get _green          => _c.green;
+  Color get _greenLight          => _c.greenLight;
+  Color get _textPrimary          => _c.textPrimary;
+  Color get _textMuted          => _c.textMuted;
+  Color get _border          => _c.border;
+  Color get _headerBg    => _c.headerBg;
 
   Uint8List? _imageBytes;
   bool _loading = true;
@@ -168,17 +171,17 @@ class _UploadScreenState extends State<UploadScreen> {
                             border: Border.all(
                                 color: _greenLight.withOpacity(0.3), width: 1),
                           ),
-                          child: const Icon(Icons.auto_awesome_rounded,
+                          child: Icon(Icons.auto_awesome_rounded,
                               color: _greenLight, size: 24),
                         ),
                         const SizedBox(height: 10),
-                        const Text('AI-Powered Analysis',
+                        Text('AI-Powered Analysis',
                             style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
                                 color: _textPrimary)),
                         const SizedBox(height: 4),
-                        const Text('Our AI will analyze your plant in seconds',
+                        Text('Our AI will analyze your plant in seconds',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: 12,
@@ -248,7 +251,7 @@ class _UploadScreenState extends State<UploadScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Photography Tips',
+        Text('Photography Tips',
             style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -263,11 +266,11 @@ class _UploadScreenState extends State<UploadScreen> {
               Container(
                   width: 6, height: 6,
                   margin: const EdgeInsets.only(top: 5, right: 10),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                       color: _green, shape: BoxShape.circle)),
               Expanded(
                   child: Text(tip,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 13, color: _textMuted, height: 1.4))),
             ],
           ),

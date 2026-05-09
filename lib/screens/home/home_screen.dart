@@ -4,6 +4,7 @@ import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
 import 'package:leafscan_app/screens/scans/scans_list_screen.dart';
 import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,14 +13,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _orange      = Color(0xFFE8924A);
-  static const Color _border      = Color(0xFF243028);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark          => _c.cardBg;
+  Color get _green          => _c.green;
+  Color get _greenLight          => _c.greenLight;
+  Color get _textPrimary          => _c.textPrimary;
+  Color get _textMuted          => _c.textMuted;
+  Color get _orange          => _c.orange;
+  Color get _border          => _c.border;
+  Color get _headerBg    => _c.headerBg;
 
   static const List<_ScanItem> _recentScans = [
     _ScanItem(plantName: 'Tomato Plant',  date: 'Mar 20, 2026', status: 'Healthy',        isHealthy: true),
@@ -89,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: _green.withOpacity(0.4), width: 1.5),
               ),
-              child: const Icon(Icons.person_rounded, color: _greenLight, size: 22),
+              child: Icon(Icons.person_rounded, color: _greenLight, size: 22),
             ),
           ),
         ],
@@ -147,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: valueColor, height: 1)),
             const SizedBox(height: 2),
-            Text(label, style: const TextStyle(fontSize: 11, color: _textMuted)),
+            Text(label, style: TextStyle(fontSize: 11, color: _textMuted)),
           ],
         ),
       ),
@@ -178,12 +181,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: _greenLight.withOpacity(0.3), width: 1),
                 ),
-                child: const Icon(Icons.camera_alt_rounded, color: _greenLight, size: 34),
+                child: Icon(Icons.camera_alt_rounded, color: _greenLight, size: 34),
               ),
               const SizedBox(height: 18),
-              const Text('Scan Plant', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: _textPrimary)),
+              Text('Scan Plant', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: _textPrimary)),
               const SizedBox(height: 5),
-              const Text('Take or upload a photo to diagnose', style: TextStyle(fontSize: 13, color: _textMuted)),
+              Text('Take or upload a photo to diagnose', style: TextStyle(fontSize: 13, color: _textMuted)),
             ],
           ),
         ),
@@ -197,10 +200,10 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text('Recent Scans', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: _textPrimary)),
+          Text('Recent Scans', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: _textPrimary)),
           GestureDetector(
             onTap: () => context.go(AppRouter.history),
-            child: const Text('View All', style: TextStyle(fontSize: 13, color: _greenLight, fontWeight: FontWeight.w500)),
+            child: Text('View All', style: TextStyle(fontSize: 13, color: _greenLight, fontWeight: FontWeight.w500)),
           ),
         ],
       ),
@@ -265,13 +268,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 10),
                     Text(scan.plantName,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
                             color: _textPrimary)),
                     const SizedBox(height: 2),
                     Text(scan.date,
-                        style: const TextStyle(fontSize: 11, color: _textMuted)),
+                        style: TextStyle(fontSize: 11, color: _textMuted)),
                     const SizedBox(height: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),

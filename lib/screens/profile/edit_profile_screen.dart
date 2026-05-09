@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -7,15 +8,17 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _inputBg     = Color(0xFF243028);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _orange      = Color(0xFFE8924A);
-  static const Color _border      = Color(0xFF243028);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark          => _c.cardBg;
+  Color get _inputBg          => _c.inputBg;
+  Color get _green          => _c.green;
+  Color get _greenLight          => _c.greenLight;
+  Color get _textPrimary          => _c.textPrimary;
+  Color get _textMuted          => _c.textMuted;
+  Color get _orange          => _c.orange;
+  Color get _border          => _c.border;
+  Color get _headerBg    => _c.headerBg;
 
   final _nameCtrl     = TextEditingController(text: 'Sarah Johnson');
   final _emailCtrl    = TextEditingController(text: 'sarah.j@email.com');
@@ -40,8 +43,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Center(child: Stack(children: [
                   Container(width: 88, height: 88,
                       decoration: BoxDecoration(color: _green.withOpacity(0.15), borderRadius: BorderRadius.circular(22), border: Border.all(color: _green.withOpacity(0.3), width: 1.5)),
-                      child: const Icon(Icons.eco_rounded, color: _greenLight, size: 42)),
-                  Positioned(bottom: 0, right: 0, child: Container(width: 28, height: 28, decoration: const BoxDecoration(color: _orange, shape: BoxShape.circle),
+                      child: Icon(Icons.eco_rounded, color: _greenLight, size: 42)),
+                  Positioned(bottom: 0, right: 0, child: Container(width: 28, height: 28, decoration: BoxDecoration(color: _orange, shape: BoxShape.circle),
                       child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 14))),
                 ])),
                 const SizedBox(height: 28),
@@ -85,7 +88,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(color: Color(0xFF1A211D), border: Border(bottom: BorderSide(color: Color(0xFF243028), width: 1))),
+      decoration: BoxDecoration(color: _headerBg, border: Border(bottom: BorderSide(color: _border, width: 1))),
       child: SafeArea(
         bottom: false,
         child: Padding(
@@ -94,17 +97,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             GestureDetector(
               onTap: () => Navigator.pop(context),
               child: Container(width: 38, height: 38, decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(10), border: Border.all(color: _border)),
-                  child: const Icon(Icons.arrow_back_rounded, color: _textMuted, size: 20)),
+                  child: Icon(Icons.arrow_back_rounded, color: _textMuted, size: 20)),
             ),
             const SizedBox(width: 14),
-            const Text('Edit Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: _textPrimary)),
+            Text('Edit Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: _textPrimary)),
           ]),
         ),
       ),
     );
   }
 
-  Widget _fieldLabel(String label) => Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _textMuted, letterSpacing: 0.4));
+  Widget _fieldLabel(String label) => Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _textMuted, letterSpacing: 0.4));
 
   Widget _inputField(TextEditingController ctrl, IconData icon, {TextInputType type = TextInputType.text}) {
     return Container(
@@ -112,7 +115,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       decoration: BoxDecoration(color: _inputBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: _border, width: 1)),
       child: TextField(
         controller: ctrl, keyboardType: type,
-        style: const TextStyle(fontSize: 14, color: _textPrimary),
+        style: TextStyle(fontSize: 14, color: _textPrimary),
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: _textMuted, size: 18),
           border: InputBorder.none, enabledBorder: InputBorder.none, focusedBorder: InputBorder.none,

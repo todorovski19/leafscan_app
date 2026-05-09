@@ -3,20 +3,30 @@ import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
 import 'package:leafscan_app/screens/plant/plant_detail_screen.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
-class ScanDetailScreen extends StatelessWidget {
+class ScanDetailScreen extends StatefulWidget {
   final ScanDetailData data;
   const ScanDetailScreen({super.key, required this.data});
 
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _orange      = Color(0xFFE8924A);
-  static const Color _border      = Color(0xFF243028);
-  static const Color _orangeBg    = Color(0xFF2A1F15);
+  @override
+  State<ScanDetailScreen> createState() => _ScanDetailScreenState();
+}
+
+class _ScanDetailScreenState extends State<ScanDetailScreen> {
+  ScanDetailData get data => widget.data;
+
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark    => _c.cardBg;
+  Color get _green       => _c.green;
+  Color get _greenLight  => _c.greenLight;
+  Color get _textPrimary => _c.textPrimary;
+  Color get _textMuted   => _c.textMuted;
+  Color get _orange      => _c.orange;
+  Color get _border      => _c.border;
+  Color get _orangeBg    => _c.orange.withOpacity(0.12);
+  Color get _headerBg    => _c.headerBg;
 
   Color get _accent      => data.isHealthy ? _green : _orange;
   Color get _accentLight => data.isHealthy ? _greenLight : _orange;
@@ -170,7 +180,7 @@ class ScanDetailScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       data.plantName,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: _textPrimary),
@@ -179,7 +189,7 @@ class ScanDetailScreen extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         data.scientificName!,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 13,
                             color: _textMuted,
                             fontStyle: FontStyle.italic),
@@ -187,11 +197,11 @@ class ScanDetailScreen extends StatelessWidget {
                     ],
                     const SizedBox(height: 8),
                     Row(children: [
-                      const Icon(Icons.calendar_today_outlined,
+                      Icon(Icons.calendar_today_outlined,
                           size: 12, color: _textMuted),
                       const SizedBox(width: 5),
                       Text('Analyzed on ${data.date}',
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 12, color: _textMuted)),
                     ]),
                   ],
@@ -206,7 +216,7 @@ class ScanDetailScreen extends StatelessWidget {
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
                             color: _accentLight)),
-                    const Text('Confidence',
+                    Text('Confidence',
                         style: TextStyle(fontSize: 11, color: _textMuted)),
                   ],
                 ),
@@ -307,7 +317,7 @@ class ScanDetailScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             data.description ?? '',
-            style: const TextStyle(fontSize: 13, color: _textMuted, height: 1.6),
+            style: TextStyle(fontSize: 13, color: _textMuted, height: 1.6),
           ),
         ],
       ),
@@ -324,7 +334,7 @@ class ScanDetailScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Disease Severity',
+              Text('Disease Severity',
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -374,7 +384,7 @@ class ScanDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Treatment Plan',
+          Text('Treatment Plan',
               style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
@@ -414,13 +424,13 @@ class ScanDetailScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(step.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: _textPrimary)),
                 const SizedBox(height: 2),
                 Text(step.description,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 12, color: _textMuted, height: 1.4)),
               ],
             ),
@@ -447,10 +457,10 @@ class ScanDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              const Icon(Icons.tips_and_updates_outlined,
+              Icon(Icons.tips_and_updates_outlined,
                   color: _orange, size: 16),
               const SizedBox(width: 6),
-              const Text('Additional Tips',
+              Text('Additional Tips',
                   style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -465,13 +475,13 @@ class ScanDetailScreen extends StatelessWidget {
                   Container(
                       width: 5, height: 5,
                       margin: const EdgeInsets.only(top: 5, right: 8),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                           color: _orange, shape: BoxShape.circle)),
                   Expanded(
                       child: Text(tip,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 12,
-                              color: Color(0xFF9A6030),
+                              color: _textMuted,
                               height: 1.4))),
                 ],
               ),
@@ -494,26 +504,26 @@ class ScanDetailScreen extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: _green.withOpacity(0.25)),
             ),
-            child: const Icon(Icons.favorite_rounded,
+            child: Icon(Icons.favorite_rounded,
                 color: _greenLight, size: 28),
           ),
           const SizedBox(height: 14),
-          const Text('Plant is Healthy!',
+          Text('Plant is Healthy!',
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: _greenLight)),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'No signs of disease detected. Keep up the good care!',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 13, color: _textMuted, height: 1.5),
           ),
           if (data.tips != null && data.tips!.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const Divider(color: Color(0xFF243028), height: 1),
+            Divider(color: _border, height: 1),
             const SizedBox(height: 14),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text('Care Tips',
                   style: TextStyle(
@@ -530,11 +540,11 @@ class ScanDetailScreen extends StatelessWidget {
                   Container(
                       width: 5, height: 5,
                       margin: const EdgeInsets.only(top: 5, right: 8),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                           color: _green, shape: BoxShape.circle)),
                   Expanded(
                       child: Text(tip,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 12,
                               color: _textMuted,
                               height: 1.4))),
@@ -578,7 +588,7 @@ class ScanDetailScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: _border, width: 1),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.download_outlined,

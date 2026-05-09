@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 class HelpCenterScreen extends StatefulWidget {
   const HelpCenterScreen({super.key});
@@ -9,14 +10,16 @@ class HelpCenterScreen extends StatefulWidget {
 }
 
 class _HelpCenterScreenState extends State<HelpCenterScreen> {
-  static const Color _bg          = Color(0xFF161C18);
-  static const Color _cardDark    = Color(0xFF1E2923);
-  static const Color _inputBg     = Color(0xFF243028);
-  static const Color _green       = Color(0xFF5C9E78);
-  static const Color _greenLight  = Color(0xFF7CC49A);
-  static const Color _textPrimary = Color(0xFFF0EDE6);
-  static const Color _textMuted   = Color(0xFF7A9080);
-  static const Color _border      = Color(0xFF243028);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardDark          => _c.cardBg;
+  Color get _inputBg          => _c.inputBg;
+  Color get _green          => _c.green;
+  Color get _greenLight          => _c.greenLight;
+  Color get _textPrimary          => _c.textPrimary;
+  Color get _textMuted          => _c.textMuted;
+  Color get _border          => _c.border;
+  Color get _headerBg    => _c.headerBg;
 
   static const String _supportEmail = 'support@plantcare-ai.app';
 
@@ -155,7 +158,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 Center(
                   child: Text(
                     'PlantCare AI · v1.0.0',
-                    style: const TextStyle(fontSize: 11, color: _textMuted),
+                    style: TextStyle(fontSize: 11, color: _textMuted),
                   ),
                 ),
               ],
@@ -167,9 +170,9 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   }
 
   Widget _buildHeader(BuildContext context) => Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF1A211D),
-          border: Border(bottom: BorderSide(color: Color(0xFF243028), width: 1)),
+        decoration: BoxDecoration(
+          color: _headerBg,
+          border: Border(bottom: BorderSide(color: _border, width: 1)),
         ),
         child: SafeArea(
           bottom: false,
@@ -186,11 +189,11 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: _border),
                   ),
-                  child: const Icon(Icons.arrow_back_rounded, color: _textMuted, size: 20),
+                  child: Icon(Icons.arrow_back_rounded, color: _textMuted, size: 20),
                 ),
               ),
               const SizedBox(width: 14),
-              const Text('Help Center',
+              Text('Help Center',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: _textPrimary)),
             ]),
           ),
@@ -213,10 +216,10 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: _green.withOpacity(0.3)),
             ),
-            child: const Icon(Icons.support_agent_rounded, color: _greenLight, size: 28),
+            child: Icon(Icons.support_agent_rounded, color: _greenLight, size: 28),
           ),
           const SizedBox(width: 16),
-          const Expanded(
+          Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('How can we help?',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: _textPrimary)),
@@ -229,7 +232,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
       );
 
   Widget _sectionLabel(String text) => Text(text,
-      style: const TextStyle(
+      style: TextStyle(
           fontSize: 13, fontWeight: FontWeight.w600, color: _textMuted, letterSpacing: 0.5));
 
   Widget _card({required List<Widget> children}) => Container(
@@ -270,10 +273,10 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(title,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 14, fontWeight: FontWeight.w600, color: _textPrimary)),
               const SizedBox(height: 2),
-              Text(value, style: const TextStyle(fontSize: 12, color: _textMuted)),
+              Text(value, style: TextStyle(fontSize: 12, color: _textMuted)),
             ]),
           ),
           if (actionIcon != null) Icon(actionIcon, color: _textMuted, size: 18),
@@ -291,10 +294,10 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         border: Border.all(color: _border, width: 1),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('Tell us what went wrong',
+        Text('Tell us what went wrong',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _textPrimary)),
         const SizedBox(height: 4),
-        const Text('Share as much detail as you can — steps to reproduce, what you expected, etc.',
+        Text('Share as much detail as you can — steps to reproduce, what you expected, etc.',
             style: TextStyle(fontSize: 12, color: _textMuted, height: 1.4)),
         const SizedBox(height: 14),
         Container(
@@ -308,8 +311,8 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             minLines: 4,
             maxLines: 8,
             maxLength: 1000,
-            style: const TextStyle(fontSize: 14, color: _textPrimary),
-            decoration: const InputDecoration(
+            style: TextStyle(fontSize: 14, color: _textPrimary),
+            decoration: InputDecoration(
               hintText: 'Describe the issue…',
               hintStyle: TextStyle(color: _textMuted, fontSize: 14),
               counterStyle: TextStyle(color: _textMuted, fontSize: 11),
@@ -360,6 +363,7 @@ class _FaqTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = LeafColors.of(context);
     return Theme(
       data: Theme.of(context).copyWith(
         dividerColor: Colors.transparent,
@@ -369,14 +373,14 @@ class _FaqTile extends StatelessWidget {
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        iconColor: _HelpCenterScreenState._textMuted,
-        collapsedIconColor: _HelpCenterScreenState._textMuted,
+        iconColor: c.textMuted,
+        collapsedIconColor: c.textMuted,
         title: Text(
           faq.question,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: _HelpCenterScreenState._textPrimary,
+            color: c.textPrimary,
           ),
         ),
         children: [
@@ -384,9 +388,9 @@ class _FaqTile extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text(
               faq.answer,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: _HelpCenterScreenState._textMuted,
+                color: c.textMuted,
                 height: 1.5,
               ),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
+import 'package:leafscan_app/theme/leaf_colors.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AnalyzingScreen — animated analysis progress, then navigates to result
@@ -19,13 +20,15 @@ class AnalyzingScreen extends StatefulWidget {
 class _AnalyzingScreenState extends State<AnalyzingScreen>
     with TickerProviderStateMixin {
   // ── Colors ──────────────────────────────────────────────────────────────
-  static const Color _bg         = Color(0xFFF0EDE6);
-  static const Color _cardBg     = Color(0xFFFFFFFF);
-  static const Color _green      = Color(0xFF5C9E78);
-  static const Color _greenLight = Color(0xFF7CC49A);
-  static const Color _textDark   = Color(0xFF1A1A1A);
-  static const Color _textMuted  = Color(0xFF8A8A8A);
-  static const Color _border     = Color(0xFFDDDDD8);
+  LeafColors get _c => LeafColors.of(context);
+  Color get _bg          => _c.bg;
+  Color get _cardBg          => _c.cardBg;
+  Color get _green          => _c.green;
+  Color get _greenLight          => _c.greenLight;
+  Color get _textDark          => _c.textPrimary;
+  Color get _textMuted          => _c.textMuted;
+  Color get _border          => _c.border;
+  Color get _headerBg    => _c.headerBg;
 
   static const _steps = [
     _Step(icon: Icons.remove_red_eye_outlined,  label: 'Analyzing image'),
@@ -136,20 +139,20 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                       border: Border.all(
                           color: _greenLight.withOpacity(0.4), width: 1.5),
                     ),
-                    child: const Icon(Icons.auto_awesome_rounded,
+                    child: Icon(Icons.auto_awesome_rounded,
                         color: _green, size: 34),
                   ),
                 ),
                 const SizedBox(height: 28),
 
                 // ── Title ─────────────────────────────────────────────────
-                const Text('Analyzing Your Plant',
+                Text('Analyzing Your Plant',
                     style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                         color: _textDark)),
                 const SizedBox(height: 6),
-                const Text('Our AI is examining the plant image…',
+                Text('Our AI is examining the plant image…',
                     style: TextStyle(fontSize: 13, color: _textMuted)),
                 const SizedBox(height: 36),
 
@@ -175,7 +178,7 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
                 }),
 
                 const SizedBox(height: 24),
-                const Text('This usually takes a few seconds',
+                Text('This usually takes a few seconds',
                     style: TextStyle(fontSize: 12, color: _textMuted)),
               ],
             ),
