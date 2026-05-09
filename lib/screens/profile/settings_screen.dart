@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/providers/theme_provider.dart';
 import 'package:leafscan_app/router/app_router.dart';
+import 'package:leafscan_app/screens/profile/help_center_screen.dart';
+import 'package:leafscan_app/screens/profile/terms_privacy_screen.dart';
 import 'package:leafscan_app/services/auth_service.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,6 +31,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   static const Color _red         = Color(0xFFE05252);
 
   bool _notificationsEnabled = true;
+
+  void _push(Widget screen) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+  }
 
   // ── Snackbar helper ────────────────────────────────────────────────────────
   void _snack(String msg, {bool error = false}) {
@@ -330,9 +336,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 20),
                 _sectionLabel('About'), const SizedBox(height: 10),
                 _card([
-                  _arrowTile(Icons.help_outline_rounded,       'Help Center',    'Get support',       () {}),
+                  _arrowTile(Icons.help_outline_rounded,       'Help Center',    'Get support',       () => _push(const HelpCenterScreen())),
                   _divider(),
-                  _arrowTile(Icons.description_outlined,       'Terms & Privacy','Legal information', () {}),
+                  _arrowTile(Icons.description_outlined,       'Terms & Privacy','Legal information', () => _push(const TermsPrivacyScreen())),
                   _divider(),
                   _plainTile(Icons.insert_drive_file_outlined, 'App Version',    'v1.0.0'),
                 ]),

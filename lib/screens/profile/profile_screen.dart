@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:leafscan_app/screens/profile/settings_screen.dart';
 import 'package:leafscan_app/screens/profile/edit_profile_screen.dart';
+import 'package:leafscan_app/screens/profile/help_center_screen.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -34,6 +36,161 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _Achievement(icon: Icons.trending_up_rounded,     iconColor: Color(0xFFE8924A), title: 'Early Adopter',   subtitle: 'Member since 2026'),
     _Achievement(icon: Icons.workspace_premium_rounded,iconColor: Color(0xFF5C9E78), title: 'Healthy Garden', subtitle: '80% healthy plants'),
   ];
+
+  void _snack(String msg, {bool error = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(msg),
+      backgroundColor: error ? const Color(0xFFE05252) : _green,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    ));
+  }
+
+  Future<void> _shareApp() async {
+    const text =
+        'Check out PlantCare AI 🌿 — instantly identify plant diseases and get care tips. '
+        'Download: https://plantcare-ai.app';
+    final box = context.findRenderObject() as RenderBox?;
+    await Share.share(
+      text,
+      subject: 'PlantCare AI',
+      sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null,
+    );
+  }
+
+  void _openHelpCenter() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const HelpCenterScreen()),
+    );
+  }
+
+  void _showRateDialog() {
+    int rating = 0;
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setS) => Dialog(
+          backgroundColor: _cardDark,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: _orange.withOpacity(0.18),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: _orange.withOpacity(0.35)),
+                  ),
+                  child: const Icon(Icons.star_rounded, color: _orange, size: 32),
+                ),
+                const SizedBox(height: 16),
+                const Text('Enjoying PlantCare AI?',
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w800, color: _textPrimary)),
+                const SizedBox(height: 6),
+                const Text(
+                  'Tap a star to rate your experience.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: _textMuted, height: 1.4),
+                ),
+                const SizedBox(height: 22),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (i) {
+                    final filled = i < rating;
+                    return GestureDetector(
+                      onTap: () => setS(() => rating = i + 1),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: AnimatedScale(
+                          scale: filled ? 1.0 : 0.92,
+                          duration: const Duration(milliseconds: 150),
+                          child: Icon(
+                            filled ? Icons.star_rounded : Icons.star_outline_rounded,
+                            size: 38,
+                            color: filled ? _orange : _textMuted,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 18,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 180),
+                    child: Text(
+                      _ratingLabel(rating),
+                      key: ValueKey(rating),
+                      style: const TextStyle(
+                          fontSize: 12, color: _greenLight, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text('Maybe Later',
+                            style: TextStyle(color: _textMuted, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: rating == 0
+                            ? null
+                            : () {
+                                Navigator.pop(ctx);
+                                _snack('Thanks for the $rating-star rating!');
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _green,
+                          foregroundColor: Colors.white,
+                          disabledBackgroundColor: _green.withOpacity(0.35),
+                          disabledForegroundColor: Colors.white70,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text('Submit',
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _ratingLabel(int rating) {
+    switch (rating) {
+      case 1: return 'We\'ll do better — tell us why.';
+      case 2: return 'Thanks — we\'re listening.';
+      case 3: return 'Glad you\'re using it!';
+      case 4: return 'Awesome, thank you!';
+      case 5: return 'You\'re amazing 🌟';
+      default: return '';
+    }
+  }
 
   Future<void> _pickImage() async {
     final source = await showModalBottomSheet<ImageSource>(
@@ -88,11 +245,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 24),
                   _sectionLabel('Quick Actions'),
                   const SizedBox(height: 12),
-                  _buildActionCard(icon: Icons.share_rounded,       title: 'Share App',       subtitle: 'Invite friends to PlantCare AI', onTap: () {}),
+                  _buildActionCard(icon: Icons.share_rounded,       title: 'Share App',       subtitle: 'Invite friends to PlantCare AI', onTap: _shareApp),
                   const SizedBox(height: 10),
-                  _buildActionCard(icon: Icons.star_rounded,        title: 'Rate Us',         subtitle: 'Love the app? Leave a review',   onTap: () {}),
+                  _buildActionCard(icon: Icons.star_rounded,        title: 'Rate Us',         subtitle: 'Love the app? Leave a review',   onTap: _showRateDialog),
                   const SizedBox(height: 10),
-                  _buildActionCard(icon: Icons.help_outline_rounded, title: 'Help & Support', subtitle: 'Get assistance anytime',          onTap: () {}),
+                  _buildActionCard(icon: Icons.help_outline_rounded, title: 'Help & Support', subtitle: 'Get assistance anytime',          onTap: _openHelpCenter),
                 ],
               ),
             ),
