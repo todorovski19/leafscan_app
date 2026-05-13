@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leafscan_app/router/app_router.dart';
-import 'package:leafscan_app/theme/app_theme.dart';
+import 'package:leafscan_app/services/auth_service.dart';
 import 'package:leafscan_app/theme/leaf_colors.dart';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AuthScreen — modern sleek login
-// lib/screens/auth/auth_screen.dart
-// ─────────────────────────────────────────────────────────────────────────────
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -19,6 +14,8 @@ class _AuthScreenState extends State<AuthScreen> {
   final _emailCtrl    = TextEditingController();
   final _passwordCtrl = TextEditingController();
   bool  _passwordHidden = true;
+  bool  _loading        = false;
+  String? _error;
 
   @override
   void dispose() {
@@ -27,7 +24,6 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
-  // ── Colours ────────────────────────────────────────────────────────────────
   LeafColors get _c => LeafColors.of(context);
   Color get _bg          => _c.bg;
   Color get _card        => _c.cardBg;
@@ -35,9 +31,32 @@ class _AuthScreenState extends State<AuthScreen> {
   Color get _border      => _c.border;
   Color get _green       => _c.green;
   Color get _greenLight  => _c.greenLight;
-  Color get _headerBg    => _c.headerBg;
   Color get _textPrimary => _c.textPrimary;
   Color get _textMuted   => _c.textMuted;
+
+  // ── Login ──────────────────────────────────────────────────────────────────
+  Future<void> _handleLogin() async {
+    final email    = _emailCtrl.text.trim();
+    final password = _passwordCtrl.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => _error = 'Please fill in all fields.');
+      return;
+    }
+
+    setState(() { _loading = true; _error = null; });
+
+    final result = await AuthService.login(email: email, password: password);
+
+    if (!mounted) return;
+    setState(() => _loading = false);
+
+    if (result.success) {
+      context.go(AppRouter.home);
+    } else {
+      setState(() => _error = result.error);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +72,10 @@ class _AuthScreenState extends State<AuthScreen> {
               _buildHeroText(),
               const SizedBox(height: 48),
               _buildForm(),
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                _buildError(_error!),
+              ],
               const SizedBox(height: 20),
               _buildLoginButton(),
               const SizedBox(height: 16),
@@ -71,12 +94,10 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // ── Hero text ──────────────────────────────────────────────────────────────
   Widget _buildHeroText() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Green accent dot
         Container(
           width: 8, height: 8,
           decoration: BoxDecoration(color: _greenLight, shape: BoxShape.circle),
@@ -86,7 +107,7 @@ class _AuthScreenState extends State<AuthScreen> {
           text: TextSpan(
             style: TextStyle(fontSize: 38, height: 1.15, fontWeight: FontWeight.w800, color: _textPrimary, letterSpacing: -1.0),
             children: [
-              TextSpan(text: 'Ready to\nheal your\n'),
+              const TextSpan(text: 'Ready to\nheal your\n'),
               TextSpan(text: 'plants?', style: TextStyle(color: _greenLight)),
             ],
           ),
@@ -100,7 +121,6 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // ── Form fields ────────────────────────────────────────────────────────────
   Widget _buildForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,6 +150,24 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildError(String msg) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.red.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: Colors.red, size: 16),
+          const SizedBox(width: 8),
+          Expanded(child: Text(msg, style: const TextStyle(fontSize: 13, color: Colors.red))),
+        ],
+      ),
     );
   }
 
@@ -174,28 +212,25 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // ── Login button ───────────────────────────────────────────────────────────
   Widget _buildLoginButton() {
     return SizedBox(
       width: double.infinity,
       height: 54,
       child: ElevatedButton(
-        onPressed: () => context.go(AppRouter.home),
+        onPressed: _loading ? null : _handleLogin,
         style: ElevatedButton.styleFrom(
           backgroundColor: _green,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
-        child: const Text(
-          'Sign In',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.3),
-        ),
+        child: _loading
+            ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+            : const Text('Sign In', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.3)),
       ),
     );
   }
 
-  // ── Forgot password ────────────────────────────────────────────────────────
   Widget _buildForgot() {
     return Center(
       child: GestureDetector(
@@ -208,13 +243,12 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // ── Divider ────────────────────────────────────────────────────────────────
   Widget _buildDivider() {
     return Row(
       children: [
         Expanded(child: Container(height: 1, color: _border)),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           child: Text('or', style: TextStyle(fontSize: 13, color: _textMuted)),
         ),
         Expanded(child: Container(height: 1, color: _border)),
@@ -222,7 +256,6 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // ── Register prompt ────────────────────────────────────────────────────────
   Widget _buildRegisterPrompt() {
     return Container(
       width: double.infinity,
@@ -234,10 +267,7 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
       child: Column(
         children: [
-          Text(
-            'New to PlantCare AI?',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: _textPrimary),
-          ),
+          Text('New to LeafScan AI?', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: _textPrimary)),
           const SizedBox(height: 4),
           Text(
             'Create a free account and start healing your plants today.',
@@ -255,10 +285,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 side: BorderSide(color: _green, width: 1.3),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text(
-                'Create Account',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-              ),
+              child: const Text('Create Account', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
             ),
           ),
         ],
@@ -266,20 +293,19 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // ── Register bottom sheet ──────────────────────────────────────────────────
   void _showRegisterSheet() {
-    final nameCtrl     = TextEditingController();
-    final emailCtrl    = TextEditingController();
-    final passCtrl     = TextEditingController();
-    bool  passHidden   = true;
+    final nameCtrl   = TextEditingController();
+    final emailCtrl  = TextEditingController();
+    final passCtrl   = TextEditingController();
+    bool  passHidden = true;
+    bool  loading    = false;
+    String? error;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: _card,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setS) => Padding(
           padding: EdgeInsets.fromLTRB(24, 20, 24, MediaQuery.of(ctx).viewInsets.bottom + 32),
@@ -287,7 +313,6 @@ class _AuthScreenState extends State<AuthScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Handle
               Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: _border, borderRadius: BorderRadius.circular(2)))),
               const SizedBox(height: 24),
               Text('Create Account', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: _textPrimary)),
@@ -312,14 +337,29 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Icon(passHidden ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: _textMuted, size: 20),
                 ),
               ),
+              if (error != null) ...[
+                const SizedBox(height: 10),
+                Text(error!, style: const TextStyle(fontSize: 13, color: Colors.red)),
+              ],
               const SizedBox(height: 28),
               SizedBox(
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    context.go(AppRouter.home);
+                  onPressed: loading ? null : () async {
+                    setS(() { loading = true; error = null; });
+                    final result = await AuthService.register(
+                      fullName: nameCtrl.text.trim(),
+                      email: emailCtrl.text.trim(),
+                      password: passCtrl.text,
+                    );
+                    if (!ctx.mounted) return;
+                    if (result.success) {
+                      Navigator.pop(ctx);
+                      if (mounted) context.go(AppRouter.home);
+                    } else {
+                      setS(() { loading = false; error = result.error; });
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _green,
@@ -327,7 +367,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  child: const Text('Create Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                  child: loading
+                      ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+                      : const Text('Create Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                 ),
               ),
             ],
@@ -337,7 +379,6 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  // ── Legal ──────────────────────────────────────────────────────────────────
   Widget _buildLegal() {
     return RichText(
       textAlign: TextAlign.center,

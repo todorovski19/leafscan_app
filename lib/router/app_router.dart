@@ -9,27 +9,25 @@ import 'package:leafscan_app/screens/disease/disease_detail_screen.dart';
 import 'package:leafscan_app/screens/plant/plant_detail_screen.dart';
 import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
 import 'package:leafscan_app/screens/scans/upload_screen.dart';
-import 'package:leafscan_app/screens/scans/analyzing_screen.dart';
-
+import 'package:leafscan_app/screens/scans/analyzing_screen.dart' as analyzingLib;
 // ─────────────────────────────────────────────────────────────────────────────
 // AppRouter — GoRouter route definitions
-// Place in: lib/router/app_router.dart
 // ─────────────────────────────────────────────────────────────────────────────
 
 class AppRouter {
   AppRouter._();
 
-  static const String splash = '/';
-  static const String login = '/login';
-  static const String home = '/home';
-  static const String scan = '/scan';
-  static const String result    = '/result';
-  static const String profile = '/profile';
-  static const String history = '/history';
+  static const String splash        = '/';
+  static const String login         = '/login';
+  static const String home          = '/home';
+  static const String scan          = '/scan';
+  static const String result        = '/result';
+  static const String profile       = '/profile';
+  static const String history       = '/history';
   static const String diseaseDetail = '/disease/:id';
   static const String plantDetail   = '/plant/:id';
-  static const String upload = '/upload';
-  static const String analyzing = '/analyzing';
+  static const String upload        = '/upload';
+  static const String analyzing     = '/analyzing';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -48,7 +46,7 @@ class AppRouter {
       ),
       GoRoute(
         path: scan,
-        builder: (context, state) => const ScanScreen(),
+        builder: (context, state) => ScanScreen(),
       ),
       GoRoute(
         path: history,
@@ -90,11 +88,8 @@ class AppRouter {
         path: analyzing,
         builder: (context, state) {
           final imagePath = state.extra as String;
-          return AnalyzingScreen(imagePath: imagePath);
-        },
+          return analyzingLib.AnalyzingScreen(imagePath: imagePath);        },
       ),
     ],
   );
 }
-
-

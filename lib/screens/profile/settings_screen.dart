@@ -85,7 +85,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
 
     // TODO: pass real refresh token from secure storage
-    final result = await AuthService.logout(refreshToken: null);
+    final result = await AuthService.logout();
 
     if (!mounted) return;
     Navigator.of(context, rootNavigator: true).pop(); // close loader
@@ -162,7 +162,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     final result = await AuthService.changePassword(
                       oldPassword: oldCtrl.text.trim(),
                       newPassword: newCtrl.text.trim(),
-                      token: null,
                     );
                     setS(() => loading = false);
                     if (!mounted) return;

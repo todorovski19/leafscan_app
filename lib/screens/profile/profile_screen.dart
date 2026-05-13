@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:leafscan_app/screens/profile/settings_screen.dart';
 import 'package:leafscan_app/screens/profile/edit_profile_screen.dart';
 import 'package:leafscan_app/screens/profile/help_center_screen.dart';
+import 'package:leafscan_app/services/api_service.dart';
 import 'package:leafscan_app/theme/leaf_colors.dart';
 import 'package:leafscan_app/widgets/app_bottom_nav_bar.dart';
 
@@ -26,19 +27,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Color get _orange      => _c.orange;
   Color get _border      => _c.border;
 
-  static const String _name     = 'Sarah Johnson';
-  static const String _bio      = 'Plant Enthusiast 🌿';
-  static const String _email    = 'sarah.j@email.com';
-  static const String _phone    = '+1 (555) 123-4567';
-  static const String _location = 'San Francisco, CA';
+  // User data from API
+  String _name     = '';
+  String _email    = '';
+  String _role     = '';
+  bool   _loading  = true;
+
+  // Summary stats
+  int _totalScans   = 0;
+  int _healthyCount = 0;
 
   File? _profileImage;
 
   static const List<_Achievement> _achievements = [
-    _Achievement(icon: Icons.eco_rounded,             iconColor: Color(0xFF7CC49A), title: 'Plant Expert',    subtitle: '50+ scans completed'),
-    _Achievement(icon: Icons.trending_up_rounded,     iconColor: Color(0xFFE8924A), title: 'Early Adopter',   subtitle: 'Member since 2026'),
-    _Achievement(icon: Icons.workspace_premium_rounded,iconColor: Color(0xFF5C9E78), title: 'Healthy Garden', subtitle: '80% healthy plants'),
+    _Achievement(icon: Icons.eco_rounded,              iconColor: Color(0xFF7CC49A), title: 'Plant Expert',    subtitle: '50+ scans completed'),
+    _Achievement(icon: Icons.trending_up_rounded,      iconColor: Color(0xFFE8924A), title: 'Early Adopter',   subtitle: 'Member since 2026'),
+    _Achievement(icon: Icons.workspace_premium_rounded, iconColor: Color(0xFF5C9E78), title: 'Healthy Garden', subtitle: '80% healthy plants'),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final me      = await ApiService.getMe();
+    final summary = await ApiService.getMySummary();
+    if (!mounted) return;
+    setState(() {
+      _name     = me?['full_name'] ?? me?['email'] ?? 'User';
+      _email    = me?['email']     ?? '';
+      _role     = me?['role']      ?? '';
+      _totalScans   = summary?['total_scans']   ?? 0;
+      _healthyCount = summary?['healthy_plants'] ?? 0;
+      _loading  = false;
+    });
+  }
 
   void _snack(String msg, {bool error = false}) {
     if (!mounted) return;
@@ -51,22 +76,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _shareApp() async {
-    const text =
-        'Check out PlantCare AI 🌿 — instantly identify plant diseases and get care tips. '
-        'Download: https://plantcare-ai.app';
+    const text = 'Check out LeafScan AI 🌿 — instantly identify plant diseases and get care tips.';
     final box = context.findRenderObject() as RenderBox?;
-    await Share.share(
-      text,
-      subject: 'PlantCare AI',
-      sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null,
-    );
+    await Share.share(text, subject: 'LeafScan AI',
+        sharePositionOrigin: box != null ? box.localToGlobal(Offset.zero) & box.size : null);
   }
 
   void _openHelpCenter() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const HelpCenterScreen()),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpCenterScreen()));
   }
 
   void _showRateDialog() {
@@ -83,26 +100,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: _orange.withOpacity(0.18),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: _orange.withOpacity(0.35)),
-                  ),
-                  child: Icon(Icons.star_rounded, color: _orange, size: 32),
-                ),
+                Container(width: 60, height: 60,
+                    decoration: BoxDecoration(color: _orange.withOpacity(0.18), shape: BoxShape.circle, border: Border.all(color: _orange.withOpacity(0.35))),
+                    child: Icon(Icons.star_rounded, color: _orange, size: 32)),
                 const SizedBox(height: 16),
-                Text('Enjoying PlantCare AI?',
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w800, color: _textPrimary)),
+                Text('Enjoying LeafScan AI?', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _textPrimary)),
                 const SizedBox(height: 6),
-                Text(
-                  'Tap a star to rate your experience.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: _textMuted, height: 1.4),
-                ),
+                Text('Tap a star to rate your experience.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: _textMuted, height: 1.4)),
                 const SizedBox(height: 22),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -112,87 +116,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onTap: () => setS(() => rating = i + 1),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: AnimatedScale(
-                          scale: filled ? 1.0 : 0.92,
-                          duration: const Duration(milliseconds: 150),
-                          child: Icon(
-                            filled ? Icons.star_rounded : Icons.star_outline_rounded,
-                            size: 38,
-                            color: filled ? _orange : _textMuted,
-                          ),
-                        ),
+                        child: Icon(filled ? Icons.star_rounded : Icons.star_outline_rounded, size: 38, color: filled ? _orange : _textMuted),
                       ),
                     );
                   }),
                 ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: 18,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 180),
-                    child: Text(
-                      _ratingLabel(rating),
-                      key: ValueKey(rating),
-                      style: TextStyle(
-                          fontSize: 12, color: _greenLight, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 18),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () => Navigator.pop(ctx),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        child: Text('Maybe Later',
-                            style: TextStyle(color: _textMuted, fontWeight: FontWeight.w600)),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: rating == 0
-                            ? null
-                            : () {
-                                Navigator.pop(ctx);
-                                _snack('Thanks for the $rating-star rating!');
-                              },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: _green,
-                          foregroundColor: Colors.white,
-                          disabledBackgroundColor: _green.withOpacity(0.35),
-                          disabledForegroundColor: Colors.white70,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        child: const Text('Submit',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-                      ),
-                    ),
-                  ],
-                ),
+                Row(children: [
+                  Expanded(child: TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text('Maybe Later', style: TextStyle(color: _textMuted, fontWeight: FontWeight.w600)),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: ElevatedButton(
+                    onPressed: rating == 0 ? null : () { Navigator.pop(ctx); _snack('Thanks for the $rating-star rating!'); },
+                    style: ElevatedButton.styleFrom(backgroundColor: _green, foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                    child: const Text('Submit', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                  )),
+                ]),
               ],
             ),
           ),
         ),
       ),
     );
-  }
-
-  String _ratingLabel(int rating) {
-    switch (rating) {
-      case 1: return 'We\'ll do better — tell us why.';
-      case 2: return 'Thanks — we\'re listening.';
-      case 3: return 'Glad you\'re using it!';
-      case 4: return 'Awesome, thank you!';
-      case 5: return 'You\'re amazing 🌟';
-      default: return '';
-    }
   }
 
   Future<void> _pickImage() async {
@@ -215,7 +162,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: Text('Choose from Gallery', style: TextStyle(fontWeight: FontWeight.w600, color: _textPrimary)),
               onTap: () => Navigator.pop(ctx, ImageSource.gallery),
             ),
-            const SizedBox(height: 8),
           ]),
         ),
       ),
@@ -233,7 +179,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           _buildHeader(context),
           Expanded(
-            child: SingleChildScrollView(
+            child: _loading
+                ? Center(child: CircularProgressIndicator(color: _green))
+                : SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,18 +196,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 24),
                   _sectionLabel('Quick Actions'),
                   const SizedBox(height: 12),
-                  _buildActionCard(icon: Icons.share_rounded,       title: 'Share App',       subtitle: 'Invite friends to PlantCare AI', onTap: _shareApp),
+                  _buildActionCard(icon: Icons.share_rounded,        title: 'Share App',       subtitle: 'Invite friends to LeafScan AI', onTap: _shareApp),
                   const SizedBox(height: 10),
-                  _buildActionCard(icon: Icons.star_rounded,        title: 'Rate Us',         subtitle: 'Love the app? Leave a review',   onTap: _showRateDialog),
+                  _buildActionCard(icon: Icons.star_rounded,         title: 'Rate Us',         subtitle: 'Love the app? Leave a review',   onTap: _showRateDialog),
                   const SizedBox(height: 10),
-                  _buildActionCard(icon: Icons.help_outline_rounded, title: 'Help & Support', subtitle: 'Get assistance anytime',          onTap: _openHelpCenter),
+                  _buildActionCard(icon: Icons.help_outline_rounded,  title: 'Help & Support', subtitle: 'Get assistance anytime',          onTap: _openHelpCenter),
                 ],
               ),
             ),
           ),
         ],
       ),
-      bottomNavigationBar: const AppBottomNavBar(currentIndex: 0),
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 3),
     );
   }
 
@@ -276,11 +224,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text('Profile', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: _textPrimary)),
               GestureDetector(
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
-                child: Container(
-                  width: 38, height: 38,
-                  decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(10), border: Border.all(color: _border)),
-                  child: Icon(Icons.settings_outlined, color: _textMuted, size: 20),
-                ),
+                child: Container(width: 38, height: 38,
+                    decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(10), border: Border.all(color: _border)),
+                    child: Icon(Icons.settings_outlined, color: _textMuted, size: 20)),
               ),
             ],
           ),
@@ -290,23 +236,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileCard(BuildContext context) {
+    final initial = _name.isNotEmpty ? _name[0].toUpperCase() : 'U';
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(20), border: Border.all(color: _border, width: 1)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          _buildAvatar(),
+          _buildAvatar(initial),
           const SizedBox(width: 16),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(_name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: _textPrimary)),
             const SizedBox(height: 2),
-            Text(_bio, style: TextStyle(fontSize: 14, color: _textMuted)),
-          ]),
+            Text(_role, style: TextStyle(fontSize: 14, color: _textMuted)),
+          ])),
         ]),
         const SizedBox(height: 20),
-        _infoRow(Icons.mail_outline_rounded,    _email),    const SizedBox(height: 10),
-        _infoRow(Icons.phone_outlined,          _phone),    const SizedBox(height: 10),
-        _infoRow(Icons.location_on_outlined,    _location),
+        _infoRow(Icons.mail_outline_rounded, _email),
         const SizedBox(height: 20),
         SizedBox(
           width: double.infinity,
@@ -325,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildAvatar() {
+  Widget _buildAvatar(String initial) {
     return SizedBox(width: 80, height: 80, child: Stack(children: [
       Container(
         width: 76, height: 76,
@@ -333,7 +278,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         clipBehavior: Clip.antiAlias,
         child: _profileImage != null
             ? Image.file(_profileImage!, fit: BoxFit.cover)
-            : Icon(Icons.eco_rounded, color: _greenLight, size: 36),
+            : Center(child: Text(initial, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: _greenLight))),
       ),
       Positioned(
         bottom: 0, right: 0,
@@ -348,16 +293,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _infoRow(IconData icon, String text) => Row(children: [
     Icon(icon, size: 16, color: _textMuted), const SizedBox(width: 10),
-    Text(text, style: TextStyle(fontSize: 13, color: _textMuted)),
+    Expanded(child: Text(text, style: TextStyle(fontSize: 13, color: _textMuted))),
   ]);
 
   Widget _buildStatsRow() {
+    final successRate = _totalScans > 0 ? '${((_healthyCount / _totalScans) * 100).round()}%' : '—';
     return Row(children: [
-      Expanded(child: _statCard(Icons.eco_rounded,        '12',  'Plants',      _greenLight)),
+      Expanded(child: _statCard(Icons.camera_alt_rounded, '$_totalScans',  'Scans',   _greenLight)),
       const SizedBox(width: 10),
-      Expanded(child: _statCard(Icons.camera_alt_rounded, '24',  'Scans',       _greenLight)),
+      Expanded(child: _statCard(Icons.eco_rounded,        '$_healthyCount', 'Healthy', _greenLight)),
       const SizedBox(width: 10),
-      Expanded(child: _statCard(Icons.trending_up_rounded,'92%', 'Success',     _orange)),
+      Expanded(child: _statCard(Icons.trending_up_rounded, successRate,    'Success', _orange)),
     ]);
   }
 

@@ -89,8 +89,7 @@ class _ScanScreenState extends State<ScanScreen> {
             width: 32, height: 32,
             decoration: BoxDecoration(
                 color: _orange.withOpacity(0.15), shape: BoxShape.circle),
-            child: Icon(Icons.tips_and_updates_outlined,
-                color: _orange, size: 17),
+            child: Icon(Icons.tips_and_updates_outlined, color: _orange, size: 17),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -98,18 +97,12 @@ class _ScanScreenState extends State<ScanScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Get Best Results',
-                    style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: _orange)),
-                SizedBox(height: 3),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _orange)),
+                const SizedBox(height: 3),
                 Text(
                     'Photograph the affected leaf in good natural lighting. '
                         'Make sure the entire leaf is visible.',
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: _textMuted,
-                        height: 1.4)),
+                    style: TextStyle(fontSize: 12, color: _textMuted, height: 1.4)),
               ],
             ),
           ),
@@ -128,10 +121,7 @@ class _ScanScreenState extends State<ScanScreen> {
           borderRadius: BorderRadius.circular(22),
           border: Border.all(color: _green.withOpacity(0.45), width: 1.5),
           boxShadow: [
-            BoxShadow(
-                color: _green.withOpacity(0.1),
-                blurRadius: 24,
-                spreadRadius: 2)
+            BoxShadow(color: _green.withOpacity(0.1), blurRadius: 24, spreadRadius: 2)
           ],
         ),
         child: Column(
@@ -142,17 +132,12 @@ class _ScanScreenState extends State<ScanScreen> {
               decoration: BoxDecoration(
                   color: _green.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                      color: _greenLight.withOpacity(0.3), width: 1)),
-              child: Icon(Icons.camera_alt_rounded,
-                  color: _greenLight, size: 28),
+                  border: Border.all(color: _greenLight.withOpacity(0.3), width: 1)),
+              child: Icon(Icons.camera_alt_rounded, color: _greenLight, size: 28),
             ),
             const SizedBox(height: 14),
             Text('Take Photo',
-                style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: _textPrimary)),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: _textPrimary)),
             const SizedBox(height: 4),
             Text('Use your camera to capture',
                 style: TextStyle(fontSize: 12, color: _textMuted)),
@@ -177,18 +162,12 @@ class _ScanScreenState extends State<ScanScreen> {
           children: [
             Container(
               width: 60, height: 60,
-              decoration: BoxDecoration(
-                  color: _border,
-                  borderRadius: BorderRadius.circular(16)),
-              child: Icon(Icons.photo_library_outlined,
-                  color: _textMuted, size: 28),
+              decoration: BoxDecoration(color: _border, borderRadius: BorderRadius.circular(16)),
+              child: Icon(Icons.photo_library_outlined, color: _textMuted, size: 28),
             ),
             const SizedBox(height: 14),
             Text('Upload from Gallery',
-                style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: _textPrimary)),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: _textPrimary)),
             const SizedBox(height: 4),
             Text('Choose from your photos',
                 style: TextStyle(fontSize: 12, color: _textMuted)),
@@ -209,11 +188,7 @@ class _ScanScreenState extends State<ScanScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Photography Tips',
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: _textMuted,
-                letterSpacing: 0.3)),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: _textMuted, letterSpacing: 0.3)),
         const SizedBox(height: 12),
         ...tips.map((tip) => Padding(
           padding: const EdgeInsets.only(bottom: 10),
@@ -223,14 +198,9 @@ class _ScanScreenState extends State<ScanScreen> {
               Container(
                   width: 6, height: 6,
                   margin: const EdgeInsets.only(top: 5, right: 10),
-                  decoration: BoxDecoration(
-                      color: _green, shape: BoxShape.circle)),
+                  decoration: BoxDecoration(color: _green, shape: BoxShape.circle)),
               Expanded(
-                  child: Text(tip,
-                      style: TextStyle(
-                          fontSize: 13,
-                          color: _textMuted,
-                          height: 1.4))),
+                  child: Text(tip, style: TextStyle(fontSize: 13, color: _textMuted, height: 1.4))),
             ],
           ),
         )),
