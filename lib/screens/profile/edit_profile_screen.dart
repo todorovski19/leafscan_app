@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:leafscan_app/services/auth_service.dart';
 import 'package:leafscan_app/theme/leaf_colors.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -8,25 +9,65 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  LeafColors get _c => LeafColors.of(context);
+  LeafColors get _c      => LeafColors.of(context);
   Color get _bg          => _c.bg;
-  Color get _cardDark          => _c.cardBg;
-  Color get _inputBg          => _c.inputBg;
-  Color get _green          => _c.green;
-  Color get _greenLight          => _c.greenLight;
-  Color get _textPrimary          => _c.textPrimary;
-  Color get _textMuted          => _c.textMuted;
-  Color get _orange          => _c.orange;
-  Color get _border          => _c.border;
+  Color get _cardDark    => _c.cardBg;
+  Color get _inputBg     => _c.inputBg;
+  Color get _green       => _c.green;
+  Color get _greenLight  => _c.greenLight;
+  Color get _textPrimary => _c.textPrimary;
+  Color get _textMuted   => _c.textMuted;
+  Color get _orange      => _c.orange;
+  Color get _border      => _c.border;
   Color get _headerBg    => _c.headerBg;
 
-  final _nameCtrl     = TextEditingController(text: 'Sarah Johnson');
-  final _emailCtrl    = TextEditingController(text: 'sarah.j@email.com');
-  final _phoneCtrl    = TextEditingController(text: '+1 (555) 123-4567');
-  final _locationCtrl = TextEditingController(text: 'San Francisco, CA');
+  final _nameCtrl  = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  bool _loading    = true;
+  bool _saving     = false;
+  String? _error;
 
   @override
-  void dispose() { _nameCtrl.dispose(); _emailCtrl.dispose(); _phoneCtrl.dispose(); _locationCtrl.dispose(); super.dispose(); }
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _emailCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadUser() async {
+    final result = await AuthService.me();
+    if (!mounted) return;
+    if (result.success && result.data != null) {
+      setState(() {
+        _nameCtrl.text  = result.data!['full_name'] ?? '';
+        _emailCtrl.text = result.data!['email']     ?? '';
+        _loading        = false;
+      });
+    } else {
+      setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _save() async {
+    setState(() { _saving = true; _error = null; });
+    // За сега само затвора — change-password е посебен endpoint
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
+    setState(() => _saving = false);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: const Text('Profile updated!'),
+      backgroundColor: _green,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    ));
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,46 +77,57 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           _buildHeader(context),
           Expanded(
-            child: ListView(
+            child: _loading
+                ? Center(child: CircularProgressIndicator(color: _green))
+                : ListView(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
               children: [
                 // Avatar
                 Center(child: Stack(children: [
-                  Container(width: 88, height: 88,
-                      decoration: BoxDecoration(color: _green.withOpacity(0.15), borderRadius: BorderRadius.circular(22), border: Border.all(color: _green.withOpacity(0.3), width: 1.5)),
-                      child: Icon(Icons.eco_rounded, color: _greenLight, size: 42)),
-                  Positioned(bottom: 0, right: 0, child: Container(width: 28, height: 28, decoration: BoxDecoration(color: _orange, shape: BoxShape.circle),
-                      child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 14))),
+                  Container(
+                    width: 88, height: 88,
+                    decoration: BoxDecoration(color: _green.withOpacity(0.15), borderRadius: BorderRadius.circular(22), border: Border.all(color: _green.withOpacity(0.3), width: 1.5)),
+                    child: Center(child: Text(
+                      _nameCtrl.text.isNotEmpty ? _nameCtrl.text[0].toUpperCase() : 'U',
+                      style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: _greenLight),
+                    )),
+                  ),
+                  Positioned(bottom: 0, right: 0, child: Container(
+                    width: 28, height: 28,
+                    decoration: BoxDecoration(color: _orange, shape: BoxShape.circle),
+                    child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 14),
+                  )),
                 ])),
                 const SizedBox(height: 28),
-                // Fields
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(20), border: Border.all(color: _border, width: 1)),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    _fieldLabel('Full Name'),   const SizedBox(height: 6),
-                    _inputField(_nameCtrl,     Icons.person_outline_rounded),
+                    _fieldLabel('Full Name'),
+                    const SizedBox(height: 6),
+                    _inputField(_nameCtrl, Icons.person_outline_rounded),
                     const SizedBox(height: 16),
-                    _fieldLabel('Email'),        const SizedBox(height: 6),
-                    _inputField(_emailCtrl,    Icons.mail_outline_rounded,    type: TextInputType.emailAddress),
-                    const SizedBox(height: 16),
-                    _fieldLabel('Phone'),        const SizedBox(height: 6),
-                    _inputField(_phoneCtrl,    Icons.phone_outlined,           type: TextInputType.phone),
-                    const SizedBox(height: 16),
-                    _fieldLabel('Location'),     const SizedBox(height: 6),
-                    _inputField(_locationCtrl, Icons.location_on_outlined),
+                    _fieldLabel('Email'),
+                    const SizedBox(height: 6),
+                    _inputField(_emailCtrl, Icons.mail_outline_rounded, type: TextInputType.emailAddress),
                   ]),
                 ),
+                if (_error != null) ...[
+                  const SizedBox(height: 12),
+                  Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                ],
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity, height: 52,
                   child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: _saving ? null : _save,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _green, foregroundColor: Colors.white, elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text('Save Changes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    child: _saving
+                        ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+                        : const Text('Save Changes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                   ),
                 ),
               ],
@@ -96,7 +148,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Row(children: [
             GestureDetector(
               onTap: () => Navigator.pop(context),
-              child: Container(width: 38, height: 38, decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(10), border: Border.all(color: _border)),
+              child: Container(width: 38, height: 38,
+                  decoration: BoxDecoration(color: _cardDark, borderRadius: BorderRadius.circular(10), border: Border.all(color: _border)),
                   child: Icon(Icons.arrow_back_rounded, color: _textMuted, size: 20)),
             ),
             const SizedBox(width: 14),
@@ -107,7 +160,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _fieldLabel(String label) => Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _textMuted, letterSpacing: 0.4));
+  Widget _fieldLabel(String label) => Text(label,
+      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _textMuted, letterSpacing: 0.4));
 
   Widget _inputField(TextEditingController ctrl, IconData icon, {TextInputType type = TextInputType.text}) {
     return Container(

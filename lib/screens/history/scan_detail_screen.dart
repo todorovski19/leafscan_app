@@ -104,7 +104,7 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () => context.go(AppRouter.home),
+                    onTap: () => Navigator.canPop(context) ? Navigator.pop(context) : context.go(AppRouter.home),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14, vertical: 9),

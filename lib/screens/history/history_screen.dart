@@ -48,7 +48,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     if (_selectedFilter == 1) list = list.where((a) => a['result_label'] == 'HEALTHY').toList();
     if (_selectedFilter == 2) list = list.where((a) => a['result_label'] == 'INFECTED').toList();
     if (_searchQuery.isNotEmpty) {
-      list = list.where((a) => (a['plant']?['name'] ?? '').toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+      list = list.where((a) => (a['plant_name'] ?? a['plant']?['name'] ?? '').toLowerCase().contains(_searchQuery.toLowerCase())).toList();
     }
     return list;
   }
@@ -154,8 +154,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _buildFilterTabs() {
     return Row(children: [
       _filterTab(0, 'All ($_totalCount)'), const SizedBox(width: 8),
-      _filterTab(1, '✅ Healthy'), const SizedBox(width: 8),
-      _filterTab(2, '⚠️ Infected'),
+      _filterTab(1, ' Healthy'), const SizedBox(width: 8),
+      _filterTab(2, '  Infected'),
     ]);
   }
 
@@ -177,9 +177,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildScanCard(dynamic analysis) {
+    debugPrint('ANALYSIS: ${analysis['plant']} | ${analysis['disease']}');
     final isHealthy  = analysis['result_label'] == 'HEALTHY';
-    final plantName  = analysis['plant']?['name'] ?? 'Unknown Plant';
-    final diseaseName= analysis['disease']?['name'] ?? '';
+    final plantName  = analysis['plant_name'] ?? analysis['plant']?['name'] ?? 'Unknown Plant';
+    final diseaseName= analysis['disease_name'] ?? analysis['disease']?['name'] ?? '';
     final confidence = analysis['confidence'] ?? 0;
     final createdAt  = analysis['created_at'] ?? '';
     final date       = createdAt.length >= 10 ? createdAt.substring(0, 10) : createdAt;
@@ -188,12 +189,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => ScanDetailScreen(
-          data: sampleDetailFromRecord(
-            plantName: plantName,
-            date: date,
-            time: '',
-            isHealthy: isHealthy,
-            status: isHealthy ? 'Healthy' : diseaseName,
+          data: ScanDetailData(
+            plantName:   plantName,
+            date:        date,
+            time:        '',
+            isHealthy:   isHealthy,
+            diseaseName: isHealthy ? null : diseaseName,
+            confidence:  ((analysis['confidence'] as num? ?? 0) * 100).round(),
+            plantId: analysis['plant_id'] as int?,
+            diseaseId: analysis['disease_id'] as int?,
           ),
         ),
       )),
@@ -224,7 +228,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Text(isHealthy ? 'Healthy' : diseaseName, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: isHealthy ? _greenLight : _orange)),
                 ),
                 const SizedBox(width: 8),
-                Text('${confidence}%', style: TextStyle(fontSize: 11, color: _textMuted)),
+                Text('${((confidence as num) * 100).toStringAsFixed(1)}%', style: TextStyle(fontSize: 11, color: _textMuted)),
               ]),
             ])),
             Icon(Icons.chevron_right_rounded, color: _textMuted, size: 20),

@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:leafscan_app/router/app_router.dart';
 import 'package:leafscan_app/screens/history/scan_detail_screen.dart';
 import 'package:leafscan_app/services/auth_service.dart';
@@ -19,20 +21,20 @@ class AnalyzingScreen extends StatefulWidget {
 class _AnalyzingScreenState extends State<AnalyzingScreen>
     with TickerProviderStateMixin {
 
-  LeafColors get _c      => LeafColors.of(context);
-  Color get _bg          => _c.bg;
-  Color get _cardBg      => _c.cardBg;
-  Color get _green       => _c.green;
-  Color get _greenLight  => _c.greenLight;
-  Color get _textDark    => _c.textPrimary;
-  Color get _textMuted   => _c.textMuted;
-  Color get _border      => _c.border;
+  LeafColors get _c     => LeafColors.of(context);
+  Color get _bg         => _c.bg;
+  Color get _cardBg     => _c.cardBg;
+  Color get _green      => _c.green;
+  Color get _greenLight => _c.greenLight;
+  Color get _textDark   => _c.textPrimary;
+  Color get _textMuted  => _c.textMuted;
+  Color get _border     => _c.border;
 
   static const _steps = [
-    _Step(icon: Icons.remove_red_eye_outlined,  label: 'Analyzing image'),
-    _Step(icon: Icons.memory_outlined,           label: 'AI processing'),
-    _Step(icon: Icons.biotech_outlined,          label: 'Identifying disease'),
-    _Step(icon: Icons.summarize_outlined,        label: 'Generating report'),
+    _Step(icon: Icons.remove_red_eye_outlined, label: 'Analyzing image'),
+    _Step(icon: Icons.memory_outlined,          label: 'AI processing'),
+    _Step(icon: Icons.biotech_outlined,         label: 'Identifying disease'),
+    _Step(icon: Icons.summarize_outlined,       label: 'Generating report'),
   ];
 
   late final List<AnimationController> _cardCtrls;
@@ -45,7 +47,9 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
   @override
   void initState() {
     super.initState();
-    _iconCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
+
+    _iconCtrl = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 900))
       ..repeat(reverse: true);
     _iconScale = Tween<double>(begin: 0.92, end: 1.08)
         .animate(CurvedAnimation(parent: _iconCtrl, curve: Curves.easeInOut));
@@ -64,78 +68,107 @@ class _AnalyzingScreenState extends State<AnalyzingScreen>
   }
 
   Future<void> _runSequence() async {
-    // Animate step cards
     for (int i = 0; i < _steps.length; i++) {
       await Future.delayed(Duration(milliseconds: i == 0 ? 300 : 550));
       if (!mounted) return;
       _cardCtrls[i].forward();
       _dotCtrls[i].repeat(reverse: true);
     }
+    await _callScanAPI();
+  }
 
-    // Call real API
+  Future<void> _callScanAPI() async {
     try {
       final token = await AuthService.getAccessToken();
+      debugPrint('TOKEN: $token');
+
       final request = http.MultipartRequest(
         'POST',
         Uri.parse('http://localhost:8000/api/analyses/scan/'),
       );
       request.headers['Authorization'] = 'Bearer ${token ?? ""}';
-      request.files.add(await http.MultipartFile.fromPath('image', widget.imagePath));
+
+      if (kIsWeb) {
+        final uri   = Uri.parse(widget.imagePath);
+        final bytes = await http.get(uri);
+        request.files.add(http.MultipartFile.fromBytes(
+          'image', bytes.bodyBytes,
+          filename: 'plant.jpg',
+          contentType: MediaType('image', 'jpeg'),
+        ));
+      } else {
+        final file  = File(widget.imagePath);
+        final bytes = await file.readAsBytes();
+        request.files.add(http.MultipartFile.fromBytes(
+          'image', bytes,
+          filename: 'plant.jpg',
+          contentType: MediaType('image', 'jpeg'),
+        ));
+      }
 
       final streamed = await request.send();
       final response = await http.Response.fromStream(streamed);
+
+      debugPrint('SCAN STATUS: ${response.statusCode}');
+      debugPrint('SCAN BODY: ${response.body}');
 
       if (!mounted) return;
       for (final c in _dotCtrls) c.stop();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data       = jsonDecode(response.body);
-        final plantName  = data['plant']?['name']   ?? 'Unknown Plant';
-        final isHealthy  = data['result_label']      == 'HEALTHY';
-        final diseaseName= data['disease']?['name']  ?? '';
-        final confidence = (data['confidence'] as num?)?.round() ?? 0;
-        final createdAt  = data['created_at']        ?? '';
-        final date       = createdAt.length >= 10 ? createdAt.substring(0, 10) : DateTime.now().toString().substring(0, 10);
-        final time       = createdAt.length >= 16 ? createdAt.substring(11, 16) : '';
-        final plantId    = data['plant']?['id']      as int?;
-        final diseaseId  = data['disease']?['id']    as int?;
-        final severity   = data['disease']?['severity'] ?? '';
-        final description= data['disease']?['description'] ?? '';
+        final body        = jsonDecode(response.body);
+        // Response structure: { analysis: { plant: {...}, disease: {...}, ... } }
+        final data        = body['analysis'] ?? body;
+        final plantName   = data['plant']?['name']         ?? 'Unknown Plant';
+        final isHealthy   = data['result_label']            == 'HEALTHY';
+        final diseaseName = data['disease']?['name']        ?? '';
+        final confidence  = ((data['confidence'] as num?)! * 100)?.round() ?? 0;
+        final createdAt   = data['created_at']              ?? '';
+        final date        = createdAt.length >= 10 ? createdAt.substring(0, 10) : DateTime.now().toString().substring(0, 10);
+        final time        = createdAt.length >= 16 ? createdAt.substring(11, 16) : '';
+        final plantId     = data['plant']?['id']            as int?;
+        final diseaseId   = data['disease']?['id']          as int?;
+        final severity    = data['disease']?['severity']    ?? '';
+        final description = data['disease']?['description'] ?? '';
 
-        context.go(
-          AppRouter.result,
-          extra: ScanDetailData(
-            plantName:    plantName,
-            date:         date,
-            time:         time,
-            isHealthy:    isHealthy,
-            diseaseName:  isHealthy ? null : diseaseName,
-            confidence:   confidence,
-            severity:     isHealthy ? null : severity,
-            description:  isHealthy ? null : description,
-            plantId:      plantId,
-            diseaseId:    isHealthy ? null : diseaseId,
-            imagePath:    widget.imagePath,
-          ),
-        );
+        if (!mounted) return;
+        context.go(AppRouter.result, extra: ScanDetailData(
+          plantName:   plantName,
+          date:        date,
+          time:        time,
+          isHealthy:   isHealthy,
+          diseaseName: isHealthy ? null : diseaseName,
+          confidence:  confidence,
+          severity:    isHealthy ? null : severity,
+          description: isHealthy ? null : description,
+          plantId:     plantId,
+          diseaseId:   isHealthy ? null : diseaseId,
+        ));
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Analysis failed (${response.statusCode}). Please try again.')),
-          );
-          context.go(AppRouter.scan);
-        }
+        _showError('Analysis failed (${response.statusCode}):\n${response.body}');
       }
     } catch (e) {
-      if (!mounted) return;
-      for (final c in _dotCtrls) c.stop();
-      // Show error
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Network error. Check your connection.')),
-      );
-      await Future.delayed(const Duration(milliseconds: 500));
-      if (mounted) context.go(AppRouter.scan);
+      debugPrint('Scan error: $e');
+      _showError('Network error: $e');
     }
+  }
+
+  void _showError(String msg) {
+    if (!mounted) return;
+    for (final c in _dotCtrls) c.stop();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Scan Failed'),
+        content: SingleChildScrollView(child: Text(msg)),
+        actions: [
+          TextButton(
+            onPressed: () { Navigator.pop(ctx); context.go(AppRouter.scan); },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -206,8 +239,8 @@ class _StepCard extends StatelessWidget {
   final _Step step;
   final AnimationController dotCtrl;
   final Color cardBg, green, border, textDark;
-
-  const _StepCard({required this.step, required this.dotCtrl, required this.cardBg, required this.green, required this.border, required this.textDark});
+  const _StepCard({required this.step, required this.dotCtrl,
+    required this.cardBg, required this.green, required this.border, required this.textDark});
 
   @override
   Widget build(BuildContext context) {

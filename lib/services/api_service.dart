@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:leafscan_app/services/auth_service.dart';
 
@@ -36,6 +37,7 @@ class ApiService {
         Uri.parse('$_base/analyses/my/'),
         headers: await _headers(),
       );
+      debugPrint('MY ANALYSES: ${res.body.substring(0, 200)}'); // ← додај ова
       if (res.statusCode == 200) return jsonDecode(res.body);
       return [];
     } catch (_) { return []; }

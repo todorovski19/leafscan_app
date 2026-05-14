@@ -128,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Hello, $firstName 👋', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: _textPrimary)),
+        Text('Hello, $firstName ', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: _textPrimary)),
         const SizedBox(height: 4),
         Text('How are your plants today?', style: TextStyle(fontSize: 13, color: _textMuted)),
       ]),
@@ -228,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCarousel() {
     return SizedBox(
-      height: 190,
+      height: 200,
       child: PageView.builder(
         controller: _pageCtrl,
         itemCount: _recentScans.length,
@@ -236,8 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (ctx, i) {
           final a          = _recentScans[i];
           final isHealthy  = a['result_label'] == 'HEALTHY';
-          final plantName  = a['plant']?['name'] ?? 'Unknown';
-          final diseaseName= a['disease']?['name'] ?? '';
+          final plantName  = a['plant_name'] ?? a['plant']?['name'] ?? 'Unknown';
+          final diseaseName= a['disease_name'] ?? a['disease']?['name'] ?? '';
           final createdAt  = a['created_at'] ?? '';
           final date       = createdAt.length >= 10 ? createdAt.substring(0, 10) : '';
           final bool isActive = i == _currentPage;
