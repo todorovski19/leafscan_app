@@ -250,8 +250,8 @@ class _HomeScreenState extends State<HomeScreen> {
               time:       '',
               isHealthy:  isHealthy,
               diseaseName: isHealthy ? null : diseaseName,
-              plantId:    a['plant']?['id'] as int?,
-              diseaseId:  a['disease']?['id'] as int?,
+              plantId:    a['plant_id']   as int?,
+              diseaseId:  a['disease_id'] as int?,
             )),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 280),
